@@ -8,6 +8,9 @@ namespace Cubinobi.Project
     {
         [Title("Movement Parameters")]
         public float movementSpeed = 6.0f;
+
+        [Range(0f, 1f), InfoBox("Some controllers have worn out sticks or are very fragile and pick up on slightest stick movements. This is a deadzone threshold that will be used to filter out the analog stick movements that are below that value.")]
+        public float deadzoneInputThreshold = 0.2f;
         
         [Title("Jump Parameters")]
         [Range(1, 10), InfoBox("How high the character can reach in the peak of the jump")]

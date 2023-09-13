@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Settings
   m_EditorClassIdentifier: 
   movementSpeed: 6
+  deadzoneInputThreshold: 0.5
   jumpHeight: 5.1
   jumpTimeToPeak: 0.4
   timeToReleaseForSmallJumpAsPercentageOfTimeToPeak: 0.4

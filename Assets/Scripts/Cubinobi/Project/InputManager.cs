@@ -45,14 +45,18 @@ namespace Cubinobi.Project
 
         private void HandleStartMove(InputAction.CallbackContext context)
         {
-            var direction = context.ReadValue<Vector2>();
+            var direction = context.ReadValue<float>();
             _eventManager.SendEvent(new StartMoveEvent(direction));
         }
         
         private void HandleStopMove(InputAction.CallbackContext context)
         {
-            var direction = context.ReadValue<Vector2>();
-            _eventManager.SendEvent(new StopMoveEvent(direction));
+            _eventManager.SendEvent(new StopMoveEvent());
+        }
+
+        private void Log(InputAction.CallbackContext context)
+        {
+            Debug.Log(context.ReadValue<float>());
         }
     }
     
@@ -68,9 +72,9 @@ namespace Cubinobi.Project
 
     public class StartMoveEvent : IEvent
     {
-        public Vector2 Direction { get; }
+        public float Direction { get; }
 
-        public StartMoveEvent(Vector2 direction)
+        public StartMoveEvent(float direction)
         {
             Direction = direction;
         }
@@ -78,12 +82,6 @@ namespace Cubinobi.Project
     
     public class StopMoveEvent : IEvent
     {
-        public Vector2 Direction { get; }
-
-        public StopMoveEvent(Vector2 direction)
-        {
-            Direction = direction;
-        }
     }
     
     #endregion

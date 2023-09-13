@@ -182,9 +182,9 @@ namespace Cubinobi
         {
             if (e is StartMoveEvent startMoveEvent)
             {
-                if (Util.IsNotZero(startMoveEvent.Direction.x))
+                if (Math.Abs(startMoveEvent.Direction) > _settings.deadzoneInputThreshold)
                 {
-                    var sign = Mathf.Sign(startMoveEvent.Direction.x);
+                    var sign = Mathf.Sign(startMoveEvent.Direction);
                     currentHorizontalVelocity = _settings.movementSpeed * sign;
                 }
             }
