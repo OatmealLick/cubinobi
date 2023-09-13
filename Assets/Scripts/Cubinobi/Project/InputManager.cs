@@ -19,42 +19,50 @@ namespace Cubinobi.Project
         public void Initialize()
         {
             _controls.Game.Enable();
-            _controls.Game.Jump.performed += HandleJump;
+            _controls.Game.Jump.performed += HandleStartJump;
+            _controls.Game.Jump.canceled += HandleStopJump;
             _controls.Game.Move.performed += HandleStartMove;
             _controls.Game.Move.canceled += HandleStopMove;
         }
 
         public void Dispose()
         {
-            _controls.Game.Jump.performed -= HandleJump;
+            _controls.Game.Jump.performed -= HandleStartJump;
+            _controls.Game.Jump.canceled -= HandleStopJump;
             _controls.Game.Move.performed -= HandleStartMove;
             _controls.Game.Move.canceled -= HandleStopMove;
         }
 
-        private void HandleJump(InputAction.CallbackContext context)
+        private void HandleStartJump(InputAction.CallbackContext context)
         {
-            Debug.Log("jump");
-            _eventManager.SendEvent(new JumpEvent());
+            _eventManager.SendEvent(new JumpStartEvent());
+        }
+
+        private void HandleStopJump(InputAction.CallbackContext context)
+        {
+            _eventManager.SendEvent(new JumpStopEvent());
         }
 
         private void HandleStartMove(InputAction.CallbackContext context)
         {
             var direction = context.ReadValue<Vector2>();
-            Debug.Log($"start move {direction}");
             _eventManager.SendEvent(new StartMoveEvent(direction));
         }
         
         private void HandleStopMove(InputAction.CallbackContext context)
         {
             var direction = context.ReadValue<Vector2>();
-            Debug.Log($"stop move {direction}");
             _eventManager.SendEvent(new StopMoveEvent(direction));
         }
     }
     
     #region InputEvents
 
-    public class JumpEvent : IEvent
+    public class JumpStopEvent : IEvent
+    {
+    }
+
+    public class JumpStartEvent : IEvent
     {
     }
 
