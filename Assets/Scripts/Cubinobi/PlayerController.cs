@@ -18,7 +18,6 @@ namespace Cubinobi
         private BoxCollider2D _collider;
 
         private float currentHorizontalVelocity;
-        private bool isJumping;
         private bool wasGrounded;
         private bool isGrounded;
         private readonly Collider2D[] groundingResults = new Collider2D [10];
@@ -26,6 +25,8 @@ namespace Cubinobi
         private const float groundCheckHeight = 0.2f;
         private bool shouldStartJump;
         private bool canJumpDuringThisFlight; // can jump during this in-air period, resets after grounded
+        private float ascendingGravityScale;
+        private float fallingGravityScale;
 
         [Inject]
         private void Construct(EventManager eventManager, Settings settings)
@@ -55,18 +56,23 @@ namespace Cubinobi
 
         private void FixedUpdate()
         {
+            // this is updated per frame to ease testing. Once it's set we can hard code it.
+            ascendingGravityScale = GravityScaler(_settings.jumpHeight, _settings.jumpTimeToPeak);
+            fallingGravityScale = ascendingGravityScale * _settings.jumpFallingGravityMultiplier;
+            _rigidbody2D.gravityScale = ascendingGravityScale;
+            
             wasGrounded = isGrounded;
             isGrounded = IsGrounded();
+            
+            var currentVelocity = _rigidbody2D.velocity;
+            
             // just landed
             if (isGrounded && !wasGrounded)
             {
                 canJumpDuringThisFlight = true;
+                _rigidbody2D.gravityScale = ascendingGravityScale;
             }
             
-            // this is updated per frame to ease testing. Once it's set we can hard code it.
-            _rigidbody2D.gravityScale = GravityScaler(_settings.jumpHeight, _settings.timeToPeak);
-
-            var currentVelocity = _rigidbody2D.velocity;
             if (Util.IsNotZero(currentHorizontalVelocity))
             {
                 currentVelocity.x = currentHorizontalVelocity;
@@ -84,17 +90,19 @@ namespace Cubinobi
                 {
                     // jump started
                     canJumpDuringThisFlight = false;
-                    isJumping = true;
                     isGrounded = false;
-                    currentVelocity.y = InitialVerticalVelocity(_settings.jumpHeight, _settings.timeToPeak);
+                    currentVelocity.y = InitialVerticalVelocity(_settings.jumpHeight, _settings.jumpTimeToPeak);
                 }
 
                 shouldStartJump = false;
             }
 
-            // continue jump
-            if (isJumping)
+            if (!isGrounded)
             {
+                if (currentVelocity.y < 0 && Util.FloatEquals(_rigidbody2D.gravityScale, ascendingGravityScale))
+                {
+                    _rigidbody2D.gravityScale = fallingGravityScale;
+                }
             }
 
             _rigidbody2D.velocity = currentVelocity;

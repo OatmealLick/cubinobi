@@ -11,9 +11,13 @@ namespace Cubinobi.Project
         
         [Title("Jump Parameters", "Out of these parameters all others are computed")]
         [Range(1, 10), InfoBox("How high the character can reach in the peak of the jump")]
-        public float jumpHeight = 3.0f;
+        public float jumpHeight = 5.0f;
         
         [Range(0.1f, 1.0f), InfoBox("Time it takes to reach the peak height of the jump.")]
-        public float timeToPeak = 0.5f;
+        public float jumpTimeToPeak = 0.4f;
+
+        [Range(1.0f, 2.0f),
+         InfoBox("When character is falling down this multiplies the gravity to achieve Hollow Knight / Mario effect.")]
+        public float jumpFallingGravityMultiplier = 1.2f;
     }
 }
