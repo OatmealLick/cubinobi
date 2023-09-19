@@ -23,10 +23,7 @@ namespace Cubinobi.Project
          InfoBox("When character is falling down this multiplies the gravity to achieve Hollow Knight / Mario effect.")]
         public float jumpFallingGravityMultiplier = 1.4f;
 
-        [Range(0.0f, 1.0f), InfoBox("Percentage of time to peak. If player released jump button before this, then it's a small jump, if not it's a big jump. If you set it to 0.5 it means that if player releases a button in first half of time to peak it will be a small jump.")]
-        public float timeToReleaseForSmallJumpAsPercentageOfTimeToPeak = 0.33f;
-
-        [InfoBox("Small jump gravity multiplier. When player releases the jump key before reaching peak, this multiplies the gravity to achieve variable height jump.")]
+        [InfoBox("Variable jump gravity multiplier. When player releases the jump key before reaching peak, this multiplies the gravity to achieve variable height jump.")]
         public float jumpVariableHeightGravityMultiplier = 1.8f;
     }
 }

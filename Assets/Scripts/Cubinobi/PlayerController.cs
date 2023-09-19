@@ -35,7 +35,6 @@ namespace Cubinobi
         private float jumpTimer;
         [SerializeField]
         private bool isJumping; // indicates whether jumped (you can fall and not be grounded but still not jumping)
-        private bool smallJumpChecked;
 
         [Inject]
         private void Construct(EventManager eventManager, Settings settings)
@@ -92,7 +91,6 @@ namespace Cubinobi
                 jumpButtonReleased = false;
                 jumpTimer = 0.0f;
                 isJumping = false;
-                smallJumpChecked = false;
                 _rigidbody2D.gravityScale = ascendingGravityScale;
             }
             
@@ -125,13 +123,9 @@ namespace Cubinobi
             {
                 jumpTimer += Time.fixedDeltaTime;
 
-                if (jumpTimer >= _settings.jumpTimeToPeak * _settings.timeToReleaseForSmallJumpAsPercentageOfTimeToPeak && !smallJumpChecked)
+                if (jumpTimer <= _settings.jumpTimeToPeak && jumpButtonReleased && !Util.FloatEquals(_rigidbody2D.gravityScale, jumpButtonReleasedGravityScale))
                 {
-                    smallJumpChecked = true;
-                    if (jumpButtonReleased)
-                    {
-                        _rigidbody2D.gravityScale = jumpButtonReleasedGravityScale;
-                    }
+                    _rigidbody2D.gravityScale = jumpButtonReleasedGravityScale;
                 }
             }
             
