@@ -47,7 +47,8 @@ namespace Cubinobi.Project
 
         private void HandleStartMove(InputAction.CallbackContext context)
         {
-            var direction = context.ReadValue<float>();
+            var direction = context.ReadValue<Vector2>();
+            Debug.Log($"Input Manager :: Start Move direction {direction}");
             _eventManager.SendEvent(new StartMoveEvent(direction));
         }
         
@@ -79,9 +80,9 @@ namespace Cubinobi.Project
 
     public class StartMoveEvent : IEvent
     {
-        public float Direction { get; }
+        public Vector2 Direction { get; }
 
-        public StartMoveEvent(float direction)
+        public StartMoveEvent(Vector2 direction)
         {
             Direction = direction;
         }

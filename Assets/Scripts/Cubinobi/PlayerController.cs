@@ -113,7 +113,7 @@ namespace Cubinobi
             if (Util.IsNotZero(currentHorizontalVelocity))
             {
                 currentVelocity.x = currentHorizontalVelocity;
-                _facingAttack = currentHorizontalVelocity > 0 ? FacingAttack.Right : FacingAttack.Left;
+                // _facingAttack = currentHorizontalVelocity > 0 ? FacingAttack.Right : FacingAttack.Left;
             }
             // should stop but is moving
             else if (Util.IsNotZero(currentVelocity.x) && Util.IsZero(currentHorizontalVelocity))
@@ -257,12 +257,15 @@ namespace Cubinobi
 
         private Rect AttackRect()
         {
-            var rotated = Quaternion.AngleAxis(90 * (int) _facingAttack, Vector3.forward) * Vector3.right;
+            var rotated = Quaternion.AngleAxis(90 * (int) _facingAttack, Vector3.back) * Vector3.right;
             var offset = rotated * _settings.attackColliderSize.x / 2;
+            var size = _facingAttack is FacingAttack.Down or FacingAttack.Up
+                ? Util.Swap(_settings.attackColliderSize)
+                : _settings.attackColliderSize;
             return new Rect
             {
                 Point = transform.position + offset,
-                Size = _settings.attackColliderSize
+                Size = size
             };
         }
 
@@ -270,12 +273,29 @@ namespace Cubinobi
         {
             if (e is StartMoveEvent startMoveEvent)
             {
-                if (Math.Abs(startMoveEvent.Direction) > _settings.deadzoneInputThreshold)
+                var directionX = startMoveEvent.Direction.x;
+                if (Math.Abs(directionX) > _settings.deadzoneInputThreshold)
                 {
-                    var sign = Mathf.Sign(startMoveEvent.Direction);
+                    var sign = Mathf.Sign(directionX);
                     currentHorizontalVelocity = _settings.movementSpeed * sign;
                 }
+                else
+                {
+                    currentHorizontalVelocity = 0;
+                }
+
+                _facingAttack = FacingForAttack(startMoveEvent.Direction);
             }
+        }
+
+        private static FacingAttack FacingForAttack(Vector2 direction)
+        {
+            if (Math.Abs(direction.x) > Math.Abs(direction.y))
+            {
+                return direction.x >= 0 ? FacingAttack.Right : FacingAttack.Left;
+            }
+
+            return direction.y >= 0 ? FacingAttack.Up : FacingAttack.Down;
         }
 
         private void HandleStopMove(IEvent e)
@@ -283,6 +303,7 @@ namespace Cubinobi
             if (e is StopMoveEvent)
             {
                 currentHorizontalVelocity = 0.0f;
+                _facingAttack = _rigidbody2D.velocity.x > 0 ? FacingAttack.Right : FacingAttack.Left;
             }
         }
 
@@ -313,11 +334,11 @@ namespace Cubinobi
 
     public enum FacingAttack
     {
-        // todo include all directions
+        // values are important, for math calculations
         Right = 0,
-        // Down = 1,
+        Down = 1,
         Left = 2,
-        // Up = 3,
+        Up = 3,
     }
 
     internal struct Rect
