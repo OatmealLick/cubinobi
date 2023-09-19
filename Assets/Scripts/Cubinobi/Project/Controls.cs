@@ -46,6 +46,15 @@ namespace Cubinobi.Project
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""AttackMelee"",
+                    ""type"": ""Button"",
+                    ""id"": ""9bb9a7ba-2317-47ff-a7f2-279565504e28"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -114,6 +123,28 @@ namespace Cubinobi.Project
                     ""action"": ""Move"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""4135d080-7f73-4bc3-8129-2861748a99c1"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""AttackMelee"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""24a18852-b2b4-4091-ae49-1407c61fec76"",
+                    ""path"": ""<Gamepad>/buttonEast"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""AttackMelee"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -124,6 +155,7 @@ namespace Cubinobi.Project
             m_Game = asset.FindActionMap("Game", throwIfNotFound: true);
             m_Game_Jump = m_Game.FindAction("Jump", throwIfNotFound: true);
             m_Game_Move = m_Game.FindAction("Move", throwIfNotFound: true);
+            m_Game_AttackMelee = m_Game.FindAction("AttackMelee", throwIfNotFound: true);
         }
 
         public void Dispose()
@@ -187,12 +219,14 @@ namespace Cubinobi.Project
         private List<IGameActions> m_GameActionsCallbackInterfaces = new List<IGameActions>();
         private readonly InputAction m_Game_Jump;
         private readonly InputAction m_Game_Move;
+        private readonly InputAction m_Game_AttackMelee;
         public struct GameActions
         {
             private @Controls m_Wrapper;
             public GameActions(@Controls wrapper) { m_Wrapper = wrapper; }
             public InputAction @Jump => m_Wrapper.m_Game_Jump;
             public InputAction @Move => m_Wrapper.m_Game_Move;
+            public InputAction @AttackMelee => m_Wrapper.m_Game_AttackMelee;
             public InputActionMap Get() { return m_Wrapper.m_Game; }
             public void Enable() { Get().Enable(); }
             public void Disable() { Get().Disable(); }
@@ -208,6 +242,9 @@ namespace Cubinobi.Project
                 @Move.started += instance.OnMove;
                 @Move.performed += instance.OnMove;
                 @Move.canceled += instance.OnMove;
+                @AttackMelee.started += instance.OnAttackMelee;
+                @AttackMelee.performed += instance.OnAttackMelee;
+                @AttackMelee.canceled += instance.OnAttackMelee;
             }
 
             private void UnregisterCallbacks(IGameActions instance)
@@ -218,6 +255,9 @@ namespace Cubinobi.Project
                 @Move.started -= instance.OnMove;
                 @Move.performed -= instance.OnMove;
                 @Move.canceled -= instance.OnMove;
+                @AttackMelee.started -= instance.OnAttackMelee;
+                @AttackMelee.performed -= instance.OnAttackMelee;
+                @AttackMelee.canceled -= instance.OnAttackMelee;
             }
 
             public void RemoveCallbacks(IGameActions instance)
@@ -239,6 +279,7 @@ namespace Cubinobi.Project
         {
             void OnJump(InputAction.CallbackContext context);
             void OnMove(InputAction.CallbackContext context);
+            void OnAttackMelee(InputAction.CallbackContext context);
         }
     }
 }

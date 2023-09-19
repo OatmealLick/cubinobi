@@ -23,6 +23,7 @@ namespace Cubinobi.Project
             _controls.Game.Jump.canceled += HandleStopJump;
             _controls.Game.Move.performed += HandleStartMove;
             _controls.Game.Move.canceled += HandleStopMove;
+            _controls.Game.AttackMelee.performed += HandleAttackMelee;
         }
 
         public void Dispose()
@@ -31,6 +32,7 @@ namespace Cubinobi.Project
             _controls.Game.Jump.canceled -= HandleStopJump;
             _controls.Game.Move.performed -= HandleStartMove;
             _controls.Game.Move.canceled -= HandleStopMove;
+            _controls.Game.AttackMelee.performed -= HandleAttackMelee;
         }
 
         private void HandleStartJump(InputAction.CallbackContext context)
@@ -52,6 +54,11 @@ namespace Cubinobi.Project
         private void HandleStopMove(InputAction.CallbackContext context)
         {
             _eventManager.SendEvent(new StopMoveEvent());
+        }
+
+        private void HandleAttackMelee(InputAction.CallbackContext context)
+        {
+            _eventManager.SendEvent(new AttackMeleeEvent());
         }
 
         private void Log(InputAction.CallbackContext context)
@@ -83,6 +90,9 @@ namespace Cubinobi.Project
     public class StopMoveEvent : IEvent
     {
     }
+    
+    public class AttackMeleeEvent : IEvent
+    {}
     
     #endregion
 }

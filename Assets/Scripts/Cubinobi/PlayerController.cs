@@ -1,5 +1,6 @@
 using System;
 using Cubinobi.Project;
+using DG.Tweening;
 using UnityEngine;
 using Zenject;
 
@@ -19,12 +20,15 @@ namespace Cubinobi
         private BoxCollider2D _collider;
 
         private float currentHorizontalVelocity;
+
         [SerializeField]
         private bool wasGrounded;
+
         [SerializeField]
         private bool isGrounded; // indicates whether is grounded, updated every frame
-        private readonly Collider2D[] groundingResults = new Collider2D [10];
-        private int groundingMask;
+
+        private readonly Collider2D[] groundedResults = new Collider2D [10];
+        private int groundedMask;
         private const float groundCheckHeight = 0.1f;
         private bool shouldStartJump;
         private bool canJumpDuringThisFlight; // can jump during this in-air period, resets after grounded
@@ -33,8 +37,17 @@ namespace Cubinobi
         private float jumpButtonReleasedGravityScale;
         private bool jumpButtonReleased;
         private float jumpTimer;
+
         [SerializeField]
         private bool isJumping; // indicates whether jumped (you can fall and not be grounded but still not jumping)
+
+        private FacingAttack _facingAttack = FacingAttack.Right;
+        private bool shouldAttackMelee;
+        private readonly Collider2D[] attackResults = new Collider2D[10];
+        private int attackMask;
+        private Tween attackMeleeGizmoTween;
+        private Color attackMeleeGizmoColor = new(0, 1, 1, 0.5f);
+        private readonly Color defaultAttackMeleeGizmoColor = new(0, 1, 1, 0.5f);
 
         [Inject]
         private void Construct(EventManager eventManager, Settings settings)
@@ -45,11 +58,13 @@ namespace Cubinobi
 
         private void Start()
         {
-            groundingMask = LayerMask.GetMask("LevelGeometry");
+            groundedMask = LayerMask.GetMask("LevelGeometry");
+            attackMask = LayerMask.GetMask("Enemies");
             _eventManager.AddListener<StartMoveEvent>(HandleStartMove);
             _eventManager.AddListener<StopMoveEvent>(HandleStopMove);
             _eventManager.AddListener<JumpStartEvent>(HandleStartJump);
             _eventManager.AddListener<JumpStopEvent>(HandleStopJump);
+            _eventManager.AddListener<AttackMeleeEvent>(HandleAttackMelee);
         }
 
         private void OnDestroy()
@@ -58,6 +73,7 @@ namespace Cubinobi
             _eventManager.RemoveListener<StopMoveEvent>(HandleStopMove);
             _eventManager.RemoveListener<JumpStartEvent>(HandleStartJump);
             _eventManager.RemoveListener<JumpStopEvent>(HandleStopJump);
+            _eventManager.RemoveListener<AttackMeleeEvent>(HandleAttackMelee);
         }
 
         private static float GravityScaler(float jumpHeight, float timeToPeak)
@@ -78,12 +94,12 @@ namespace Cubinobi
             fallingGravityScale = ascendingGravityScale * _settings.jumpFallingGravityMultiplier;
             jumpButtonReleasedGravityScale = ascendingGravityScale * _settings.jumpVariableHeightGravityMultiplier;
             _rigidbody2D.gravityScale = ascendingGravityScale;
-            
+
             wasGrounded = isGrounded;
             isGrounded = IsGrounded();
-            
+
             var currentVelocity = _rigidbody2D.velocity;
-            
+
             // just landed, 'reset' all the jump state variables
             if (isGrounded && !wasGrounded)
             {
@@ -93,10 +109,11 @@ namespace Cubinobi
                 isJumping = false;
                 _rigidbody2D.gravityScale = ascendingGravityScale;
             }
-            
+
             if (Util.IsNotZero(currentHorizontalVelocity))
             {
                 currentVelocity.x = currentHorizontalVelocity;
+                _facingAttack = currentHorizontalVelocity > 0 ? FacingAttack.Right : FacingAttack.Left;
             }
             // should stop but is moving
             else if (Util.IsNotZero(currentVelocity.x) && Util.IsZero(currentHorizontalVelocity))
@@ -123,12 +140,13 @@ namespace Cubinobi
             {
                 jumpTimer += Time.fixedDeltaTime;
 
-                if (jumpTimer <= _settings.jumpTimeToPeak && jumpButtonReleased && !Util.FloatEquals(_rigidbody2D.gravityScale, jumpButtonReleasedGravityScale))
+                if (jumpTimer <= _settings.jumpTimeToPeak && jumpButtonReleased &&
+                    !Util.FloatEquals(_rigidbody2D.gravityScale, jumpButtonReleasedGravityScale))
                 {
                     _rigidbody2D.gravityScale = jumpButtonReleasedGravityScale;
                 }
             }
-            
+
             if (!isGrounded)
             {
                 if (currentVelocity.y < 0 && !Util.FloatEquals(_rigidbody2D.gravityScale, fallingGravityScale))
@@ -140,26 +158,66 @@ namespace Cubinobi
             _rigidbody2D.velocity = currentVelocity;
         }
 
+        private void Update()
+        {
+            if (shouldAttackMelee)
+            {
+                shouldAttackMelee = false;
+
+                if (attackMeleeGizmoTween != null && attackMeleeGizmoTween.IsPlaying())
+                {
+                    attackMeleeGizmoTween.Kill();
+                }
+
+                attackMeleeGizmoColor = Color.white;
+                attackMeleeGizmoTween = DOTween.To(
+                    () => attackMeleeGizmoColor,
+                    c => attackMeleeGizmoColor = c,
+                    defaultAttackMeleeGizmoColor,
+                    _settings.attackMeleeGizmoFlashDuration
+                );
+                
+                var rect = AttackRect();
+                var hitColliders = Physics2D.OverlapBoxNonAlloc(
+                    rect.Point,
+                    rect.Size,
+                    0f,
+                    attackResults,
+                    attackMask);
+                
+                for (var i = 0; i < hitColliders; i++)
+                {
+                    var coll = attackResults[i];
+                    if (coll == null)
+                    {
+                        Debug.LogError("Your code does not work!");
+                        return;
+                    }
+                    
+                    Debug.Log($"Hit enemy {coll.name}, {coll.gameObject.name}");
+                    coll.GetComponent<Enemy>().Hit();
+                }
+            }
+
+            // cleanup part of update loop
+            
+            for (var i = 0; i < attackResults.Length; ++i)
+            {
+                attackResults[i] = null;
+            }
+        }
+
         private bool IsGrounded()
         {
             // todo make sure it works when changing character sprite & size
+            var rect = GroundedRect();
             var groundCollidersCount = Physics2D.OverlapBoxNonAlloc(
-                (Vector2) transform.position + GroundingPositionOffset(),
-                new Vector2(ColliderWidth(), groundCheckHeight),
+                rect.Point,
+                rect.Size,
                 0f,
-                groundingResults,
-                groundingMask);
+                groundedResults,
+                groundedMask);
             return groundCollidersCount != 0;
-        }
-
-        private Vector2 GroundingPositionOffset()
-        {
-            return new Vector2(0, -((_collider.size.y / 2) + (groundCheckHeight * 1.4f / 2)));
-        }
-
-        private float ColliderWidth()
-        {
-            return _collider.size.x * 0.8f;
         }
 
         private void OnDrawGizmos()
@@ -167,9 +225,38 @@ namespace Cubinobi
             Gizmos.color = Color.red;
 
             // draw grounding collider gizmo
+            var groundedRect = GroundedRect();
             Gizmos.DrawWireCube(
-                transform.position + (Vector3) GroundingPositionOffset(),
-                new Vector3(ColliderWidth(), groundCheckHeight, 1f));
+                groundedRect.Point,
+                new Vector3(groundedRect.Size.x, groundedRect.Size.y, 1));
+
+            if (_settings != null)
+            {
+                Gizmos.color = attackMeleeGizmoColor;
+                var attackRect = AttackRect();
+                Gizmos.DrawCube(attackRect.Point, attackRect.Size);
+            }
+        }
+
+        private Rect GroundedRect()
+        {
+            var size = _collider.size;
+            return new Rect
+            {
+                Point = (Vector2) transform.position + new Vector2(0, -((size.y / 2) + (groundCheckHeight * 1.4f / 2))),
+                Size = new Vector2(size.x * 0.8f, groundCheckHeight)
+            };
+        }
+
+        private Rect AttackRect()
+        {
+            var rotated = Quaternion.AngleAxis(90 * (int) _facingAttack, Vector3.forward) * Vector3.right;
+            var offset = rotated * _settings.attackColliderSize.x / 2;
+            return new Rect
+            {
+                Point = transform.position + offset,
+                Size = _settings.attackColliderSize
+            };
         }
 
         private void HandleStartMove(IEvent e)
@@ -199,13 +286,36 @@ namespace Cubinobi
                 shouldStartJump = true;
             }
         }
-        
+
         private void HandleStopJump(IEvent e)
         {
-            if (e is JumpStopEvent)
+            if (e is JumpStopEvent && !isGrounded)
             {
                 jumpButtonReleased = true;
             }
         }
+        
+        private void HandleAttackMelee(IEvent e)
+        {
+            if (e is AttackMeleeEvent)
+            {
+                shouldAttackMelee = true;
+            }
+        }
+    }
+
+    public enum FacingAttack
+    {
+        // todo include all directions
+        Right = 0,
+        // Down = 1,
+        Left = 2,
+        // Up = 3,
+    }
+
+    internal struct Rect
+    {
+        public Vector2 Point;
+        public Vector2 Size;
     }
 }

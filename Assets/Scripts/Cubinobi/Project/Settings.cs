@@ -25,5 +25,12 @@ namespace Cubinobi.Project
 
         [InfoBox("Variable jump gravity multiplier. When player releases the jump key before reaching peak, this multiplies the gravity to achieve variable height jump.")]
         public float jumpVariableHeightGravityMultiplier = 1.8f;
+
+        [Title("Attack Parameters")]
+        [InfoBox("Modifies the size of the collider that is being used to check whether an enemy was hit by an attack.")]
+        public Vector2 attackColliderSize = new(1.8f, 1.2f);
+
+        [InfoBox("Time in seconds for melee attack flash. Purely visual setting, does not effect mechanics. (attack happens instantaneously)")]
+        public float attackMeleeGizmoFlashDuration = 0.3f;
     }
 }

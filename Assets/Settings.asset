@@ -17,5 +17,5 @@ MonoBehaviour:
   jumpHeight: 4.98
   jumpTimeToPeak: 0.406
   jumpFallingGravityMultiplier: 1.4
-  timeToReleaseForSmallJumpAsPercentageOfTimeToPeak: 0.4
   jumpVariableHeightGravityMultiplier: 8
+  attackColliderSize: {x: 1.8, y: 2.5}
