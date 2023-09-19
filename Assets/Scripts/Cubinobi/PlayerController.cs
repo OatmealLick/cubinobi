@@ -156,6 +156,13 @@ namespace Cubinobi
             }
 
             _rigidbody2D.velocity = currentVelocity;
+            
+            // cleanup part of fixed update loop
+            
+            for (var i = 0; i < groundedResults.Length; ++i)
+            {
+                groundedResults[i] = null;
+            }
         }
 
         private void Update()
