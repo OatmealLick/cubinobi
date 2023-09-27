@@ -13,3 +13,4 @@ MonoBehaviour:
   m_Name: SettingsInstaller
   m_EditorClassIdentifier: 
   Settings: {fileID: 11400000, guid: 70f8b06154b38524bb9e6c1341093c16, type: 2}
+  ElementalStancesResources: {fileID: 11400000, guid: 98654a1bb503add439809f923e5edc20, type: 2}

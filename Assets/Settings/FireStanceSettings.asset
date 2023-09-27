@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a8ba3b69cc2484599b4a4a3b2bf75de, type: 3}
+  m_Name: FireStanceSettings
+  m_EditorClassIdentifier: 
+  movementSpeed: 6
+  jumpHeight: 5
+  jumpTimeToPeak: 0.4
+  jumpFallingGravityMultiplier: 1.4
+  jumpVariableHeightGravityMultiplier: 1.8
+  attackColliderSize: {x: 1.8, y: 1.2}
+  Hitboxes:
+  - Size: {x: 0, y: 0}
+    PositionOffset: {x: 0, y: 0}
+  - Size: {x: 0, y: 0}
+    PositionOffset: {x: 0, y: 0}
+  - Size: {x: 0, y: 0}
+    PositionOffset: {x: 0, y: 0}
+  - Size: {x: 0, y: 0}
+    PositionOffset: {x: 0, y: 0}

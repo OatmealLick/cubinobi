@@ -24,6 +24,13 @@ namespace Cubinobi.Project
             _controls.Game.Move.performed += HandleStartMove;
             _controls.Game.Move.canceled += HandleStopMove;
             _controls.Game.AttackMelee.performed += HandleAttackMelee;
+            _controls.Game.AttackRanged.performed += HandleAttackRanged;
+            _controls.Game.ChangeStanceEarth.performed += HandleChangeStanceEarth;
+            _controls.Game.ChangeStanceFire.performed += HandleChangeStanceFire;
+            _controls.Game.ChangeStanceWind.performed += HandleChangeStanceWind;
+            _controls.Game.ChangeStanceWater.performed += HandleChangeStanceWater;
+            _controls.Game.ChangeStanceVoid.performed += HandleChangeStanceVoid;
+            _controls.Game.ChangeStanceBasic.performed += HandleChangeStanceBasic;
         }
 
         public void Dispose()
@@ -33,6 +40,13 @@ namespace Cubinobi.Project
             _controls.Game.Move.performed -= HandleStartMove;
             _controls.Game.Move.canceled -= HandleStopMove;
             _controls.Game.AttackMelee.performed -= HandleAttackMelee;
+            _controls.Game.AttackRanged.performed -= HandleAttackRanged;
+            _controls.Game.ChangeStanceEarth.performed -= HandleChangeStanceEarth;
+            _controls.Game.ChangeStanceFire.performed -= HandleChangeStanceFire;
+            _controls.Game.ChangeStanceWind.performed -= HandleChangeStanceWind;
+            _controls.Game.ChangeStanceWater.performed -= HandleChangeStanceWater;
+            _controls.Game.ChangeStanceVoid.performed -= HandleChangeStanceVoid;
+            _controls.Game.ChangeStanceBasic.performed -= HandleChangeStanceBasic;
         }
 
         private void HandleStartJump(InputAction.CallbackContext context)
@@ -61,6 +75,41 @@ namespace Cubinobi.Project
         {
             _eventManager.SendEvent(new AttackMeleeEvent());
         }
+
+        private void HandleAttackRanged(InputAction.CallbackContext context)
+        {
+            _eventManager.SendEvent(new AttackRangedEvent());
+        }
+
+        private void HandleChangeStanceEarth(InputAction.CallbackContext context)
+        {
+            _eventManager.SendEvent(new ChangeStanceEvent(ElementalStance.Earth));
+        }
+
+        private void HandleChangeStanceFire(InputAction.CallbackContext context)
+        {
+            _eventManager.SendEvent(new ChangeStanceEvent(ElementalStance.Fire));
+        }
+        private void HandleChangeStanceWind(InputAction.CallbackContext context)
+        {
+            _eventManager.SendEvent(new ChangeStanceEvent(ElementalStance.Wind));
+        }
+
+        private void HandleChangeStanceWater(InputAction.CallbackContext context)
+        {
+            _eventManager.SendEvent(new ChangeStanceEvent(ElementalStance.Water));
+        }
+
+        private void HandleChangeStanceVoid(InputAction.CallbackContext context)
+        {
+            _eventManager.SendEvent(new ChangeStanceEvent(ElementalStance.Void));
+        }
+
+        private void HandleChangeStanceBasic(InputAction.CallbackContext context)
+        {
+            _eventManager.SendEvent(new ChangeStanceEvent(ElementalStance.Basic));
+        }
+
 
         private void Log(InputAction.CallbackContext context)
         {
@@ -94,6 +143,18 @@ namespace Cubinobi.Project
     
     public class AttackMeleeEvent : IEvent
     {}
+    public class AttackRangedEvent : IEvent
+    {}
+
+    public class ChangeStanceEvent : IEvent
+    {
+        public ElementalStance Stance;
+
+        public ChangeStanceEvent(ElementalStance stance)
+        {
+            Stance = stance;
+        }
+    }
     
     #endregion
 }

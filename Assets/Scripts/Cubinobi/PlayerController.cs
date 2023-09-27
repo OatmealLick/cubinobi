@@ -1,4 +1,5 @@
 using System;
+using System.Timers;
 using Cubinobi.Project;
 using DG.Tweening;
 using UnityEngine;
@@ -10,6 +11,15 @@ namespace Cubinobi
     {
         private EventManager _eventManager;
         private Settings _settings;
+        private ElementalStancesResources _elementalStancesResources;
+
+        [SerializeField]
+        [HideInInspector]
+        private SpriteRenderer _renderer;
+
+        [SerializeField]
+        [HideInInspector]
+        private SpriteRenderer _stanceIndicator;
 
         [SerializeField]
         [HideInInspector]
@@ -19,6 +29,12 @@ namespace Cubinobi
         [HideInInspector]
         private BoxCollider2D _collider;
 
+        [SerializeField]
+        private ShurikenController _shurikenPrefab;
+
+        [SerializeField]
+        private Transform _projectilesParent;
+
         private float currentHorizontalVelocity;
 
         [SerializeField]
@@ -27,7 +43,13 @@ namespace Cubinobi
         [SerializeField]
         private bool isGrounded; // indicates whether is grounded, updated every frame
 
+        [SerializeField]
+        private bool _facingRight = true; // facing for movement, separate from facing for attack
+        // facing update rules so far
+        // 0. Update only on inputs treated as valid movement (deadzone threshold)
+
         private readonly Collider2D[] groundedResults = new Collider2D [10];
+        private int levelGeometryMask;
         private int groundedMask;
         private const float groundCheckHeight = 0.1f;
         private bool shouldStartJump;
@@ -41,30 +63,53 @@ namespace Cubinobi
         [SerializeField]
         private bool isJumping; // indicates whether jumped (you can fall and not be grounded but still not jumping)
 
+        [SerializeField]
         private FacingAttack _facingAttack = FacingAttack.Right;
+        // facing update rules so far
+        // 0. Update only on inputs treated as valid movement (deadzone threshold)
+        // 1. If you actively press keys it should be set based on those keys
+        // 2. If you stop movement it should be set on last movement facing (directly on _facingRight in this case)
+
         private bool shouldAttackMelee;
         private readonly Collider2D[] attackResults = new Collider2D[10];
-        private int attackMask;
+        private int enemiesMask;
         private Tween attackMeleeGizmoTween;
-        private Color attackMeleeGizmoColor = new(0, 1, 1, 0.5f);
-        private readonly Color defaultAttackMeleeGizmoColor = new(0, 1, 1, 0.5f);
+        private Color attackMeleeGizmoColor = new(0, 1, 1, 0.3f);
+        private readonly Color defaultAttackMeleeGizmoColor = new(0, 1, 1, 0.3f);
+
+        [SerializeField]
+        private ElementalStance _stance = ElementalStance.Basic;
+
+        private bool shouldAttackRanged;
+        private readonly Color attackRangedGizmoColor = new(0, 1, 1, 0.15f);
+
+        // todo remove artificials
+        private float artificialMeleeAttackTimer;
+        private float artificialRangedAttackTimer;
 
         [Inject]
-        private void Construct(EventManager eventManager, Settings settings)
+        private void Construct(EventManager eventManager,
+            Settings settings,
+            ElementalStancesResources elementalStancesResources)
         {
             _eventManager = eventManager;
             _settings = settings;
+            _elementalStancesResources = elementalStancesResources;
         }
+
 
         private void Start()
         {
-            groundedMask = LayerMask.GetMask("LevelGeometry");
-            attackMask = LayerMask.GetMask("Enemies");
+            levelGeometryMask = LayerMask.GetMask("LevelGeometry");
+            groundedMask = LayerMask.GetMask("LevelGeometry", "Enemies");
+            enemiesMask = LayerMask.GetMask("Enemies");
             _eventManager.AddListener<StartMoveEvent>(HandleStartMove);
             _eventManager.AddListener<StopMoveEvent>(HandleStopMove);
             _eventManager.AddListener<JumpStartEvent>(HandleStartJump);
             _eventManager.AddListener<JumpStopEvent>(HandleStopJump);
             _eventManager.AddListener<AttackMeleeEvent>(HandleAttackMelee);
+            _eventManager.AddListener<AttackRangedEvent>(HandleAttackRanged);
+            _eventManager.AddListener<ChangeStanceEvent>(HandleChangeStance);
         }
 
         private void OnDestroy()
@@ -74,6 +119,8 @@ namespace Cubinobi
             _eventManager.RemoveListener<JumpStartEvent>(HandleStartJump);
             _eventManager.RemoveListener<JumpStopEvent>(HandleStopJump);
             _eventManager.RemoveListener<AttackMeleeEvent>(HandleAttackMelee);
+            _eventManager.RemoveListener<AttackRangedEvent>(HandleAttackRanged);
+            _eventManager.RemoveListener<ChangeStanceEvent>(HandleChangeStance);
         }
 
         private static float GravityScaler(float jumpHeight, float timeToPeak)
@@ -90,10 +137,13 @@ namespace Cubinobi
         private void FixedUpdate()
         {
             // this is updated per frame to ease testing. Once it's set we can hard code it.
-            ascendingGravityScale = GravityScaler(_settings.jumpHeight, _settings.jumpTimeToPeak);
-            fallingGravityScale = ascendingGravityScale * _settings.jumpFallingGravityMultiplier;
-            jumpButtonReleasedGravityScale = ascendingGravityScale * _settings.jumpVariableHeightGravityMultiplier;
-            _rigidbody2D.gravityScale = ascendingGravityScale;
+            ascendingGravityScale =
+                GravityScaler(ActiveStanceSettings().jumpHeight, ActiveStanceSettings().jumpTimeToPeak);
+            fallingGravityScale = ascendingGravityScale * ActiveStanceSettings().jumpFallingGravityMultiplier;
+            jumpButtonReleasedGravityScale =
+                ascendingGravityScale * ActiveStanceSettings().jumpVariableHeightGravityMultiplier;
+            _rigidbody2D.gravityScale =
+                ascendingGravityScale; // todo check whether this should be here, consider adding if not equal to what  should be
 
             wasGrounded = isGrounded;
             isGrounded = IsGrounded();
@@ -113,7 +163,6 @@ namespace Cubinobi
             if (Util.IsNotZero(currentHorizontalVelocity))
             {
                 currentVelocity.x = currentHorizontalVelocity;
-                // _facingAttack = currentHorizontalVelocity > 0 ? FacingAttack.Right : FacingAttack.Left;
             }
             // should stop but is moving
             else if (Util.IsNotZero(currentVelocity.x) && Util.IsZero(currentHorizontalVelocity))
@@ -130,7 +179,8 @@ namespace Cubinobi
                     canJumpDuringThisFlight = false;
                     isGrounded = false;
                     isJumping = true;
-                    currentVelocity.y = InitialVerticalVelocity(_settings.jumpHeight, _settings.jumpTimeToPeak);
+                    currentVelocity.y = InitialVerticalVelocity(ActiveStanceSettings().jumpHeight,
+                        ActiveStanceSettings().jumpTimeToPeak);
                 }
 
                 shouldStartJump = false;
@@ -140,7 +190,7 @@ namespace Cubinobi
             {
                 jumpTimer += Time.fixedDeltaTime;
 
-                if (jumpTimer <= _settings.jumpTimeToPeak && jumpButtonReleased &&
+                if (jumpTimer <= ActiveStanceSettings().jumpTimeToPeak && jumpButtonReleased &&
                     !Util.FloatEquals(_rigidbody2D.gravityScale, jumpButtonReleasedGravityScale))
                 {
                     _rigidbody2D.gravityScale = jumpButtonReleasedGravityScale;
@@ -156,9 +206,37 @@ namespace Cubinobi
             }
 
             _rigidbody2D.velocity = currentVelocity;
-            
+
+            // todo remove start
+            if (ActiveStanceSettings().useArtificialMeleeAttackDelay)
+            {
+                if (artificialMeleeAttackTimer > 0)
+                {
+                    artificialMeleeAttackTimer -= Time.deltaTime;
+                    if (artificialMeleeAttackTimer < 0)
+                    {
+                        artificialMeleeAttackTimer = 0.0f;
+                        shouldAttackMelee = true;
+                    }
+                }
+            }
+
+            if (ActiveStanceSettings().useArtificialRangedAttackDelay)
+            {
+                if (artificialRangedAttackTimer > 0)
+                {
+                    artificialRangedAttackTimer -= Time.deltaTime;
+                    if (artificialRangedAttackTimer < 0)
+                    {
+                        artificialRangedAttackTimer = 0.0f;
+                        shouldAttackRanged = true;
+                    }
+                }
+            }
+            // todo remove stop
+
             // cleanup part of fixed update loop
-            
+
             for (var i = 0; i < groundedResults.Length; ++i)
             {
                 groundedResults[i] = null;
@@ -183,15 +261,15 @@ namespace Cubinobi
                     defaultAttackMeleeGizmoColor,
                     _settings.attackMeleeGizmoFlashDuration
                 );
-                
-                var rect = AttackRect();
+
+                var rect = MeleeAttackRect();
                 var hitColliders = Physics2D.OverlapBoxNonAlloc(
                     rect.Point,
                     rect.Size,
                     0f,
                     attackResults,
-                    attackMask);
-                
+                    enemiesMask);
+
                 for (var i = 0; i < hitColliders; i++)
                 {
                     var coll = attackResults[i];
@@ -200,14 +278,33 @@ namespace Cubinobi
                         Debug.LogError("Your code does not work!");
                         return;
                     }
-                    
+
                     Debug.Log($"Hit enemy {coll.name}, {coll.gameObject.name}");
                     coll.GetComponent<Enemy>().Hit();
                 }
             }
 
+            if (shouldAttackRanged)
+            {
+                shouldAttackRanged = false;
+
+                var shuriken = Instantiate(_shurikenPrefab, transform.position, Quaternion.identity,
+                    _projectilesParent);
+                var hitbox = ActiveStanceSettings().RangedAttackHitboxes[(int) _facingAttack];
+                var distance = _facingAttack is FacingAttack.Down or FacingAttack.Up
+                    ? Math.Abs(hitbox.Size.y)
+                    : Math.Abs(hitbox.Size.x);
+                shuriken.Setup(
+                    ActiveStanceSettings(),
+                    DirectionForAttack(_facingAttack),
+                    distance,
+                    enemiesMask,
+                    levelGeometryMask
+                );
+            }
+
             // cleanup part of update loop
-            
+
             for (var i = 0; i < attackResults.Length; ++i)
             {
                 attackResults[i] = null;
@@ -240,8 +337,12 @@ namespace Cubinobi
             if (_settings != null)
             {
                 Gizmos.color = attackMeleeGizmoColor;
-                var attackRect = AttackRect();
-                Gizmos.DrawCube(attackRect.Point, attackRect.Size);
+                var meleeAttackRect = MeleeAttackRect();
+                Gizmos.DrawCube(meleeAttackRect.Point, meleeAttackRect.Size);
+
+                Gizmos.color = attackRangedGizmoColor;
+                var rangedAttackRect = RangedAttackRect();
+                Gizmos.DrawCube(rangedAttackRect.Point, rangedAttackRect.Size);
             }
         }
 
@@ -255,17 +356,28 @@ namespace Cubinobi
             };
         }
 
-        private Rect AttackRect()
+        private Rect MeleeAttackRect()
         {
-            var rotated = Quaternion.AngleAxis(90 * (int) _facingAttack, Vector3.back) * Vector3.right;
-            var offset = rotated * _settings.attackColliderSize.x / 2;
-            var size = _facingAttack is FacingAttack.Down or FacingAttack.Up
-                ? Util.Swap(_settings.attackColliderSize)
-                : _settings.attackColliderSize;
+            var hitbox = ActiveStanceSettings().MeleeAttackHitboxes[(int) _facingAttack];
             return new Rect
             {
-                Point = transform.position + offset,
-                Size = size
+                Point = (Vector2) transform.position + hitbox.PositionOffset,
+                Size = hitbox.Size
+            };
+        }
+
+        private Vector2 DirectionForAttack(FacingAttack facingAttack)
+        {
+            return Quaternion.AngleAxis(90 * (int) _facingAttack, Vector3.back) * Vector3.right;
+        }
+
+        private Rect RangedAttackRect()
+        {
+            var hitbox = ActiveStanceSettings().RangedAttackHitboxes[(int) _facingAttack];
+            return new Rect
+            {
+                Point = (Vector2) transform.position + hitbox.PositionOffset,
+                Size = hitbox.Size
             };
         }
 
@@ -273,19 +385,29 @@ namespace Cubinobi
         {
             if (e is StartMoveEvent startMoveEvent)
             {
-                var directionX = startMoveEvent.Direction.x;
-                if (Math.Abs(directionX) > _settings.deadzoneInputThreshold)
+                if (Math.Abs(startMoveEvent.Direction.x) > _settings.deadzoneInputThreshold)
                 {
-                    var sign = Mathf.Sign(directionX);
-                    currentHorizontalVelocity = _settings.movementSpeed * sign;
+                    var sign = Mathf.Sign(startMoveEvent.Direction.x);
+                    currentHorizontalVelocity = ActiveStanceSettings().movementSpeed * sign;
+                    SetFacingForMovement(currentHorizontalVelocity > 0);
                 }
                 else
                 {
                     currentHorizontalVelocity = 0;
                 }
 
-                _facingAttack = FacingForAttack(startMoveEvent.Direction);
+                if (Math.Abs(startMoveEvent.Direction.x) > _settings.deadzoneInputThreshold ||
+                    Math.Abs(startMoveEvent.Direction.y) > _settings.deadzoneInputThreshold)
+                {
+                    _facingAttack = FacingForAttack(startMoveEvent.Direction);
+                }
             }
+        }
+
+        private void SetFacingForMovement(bool facingRight)
+        {
+            _facingRight = facingRight;
+            _renderer.flipX = !facingRight;
         }
 
         private static FacingAttack FacingForAttack(Vector2 direction)
@@ -302,8 +424,12 @@ namespace Cubinobi
         {
             if (e is StopMoveEvent)
             {
+                if (_facingAttack is FacingAttack.Down or FacingAttack.Up)
+                {
+                    _facingAttack = _facingRight ? FacingAttack.Right : FacingAttack.Left;
+                }
+
                 currentHorizontalVelocity = 0.0f;
-                _facingAttack = _rigidbody2D.velocity.x > 0 ? FacingAttack.Right : FacingAttack.Left;
             }
         }
 
@@ -322,13 +448,57 @@ namespace Cubinobi
                 jumpButtonReleased = true;
             }
         }
-        
+
         private void HandleAttackMelee(IEvent e)
         {
             if (e is AttackMeleeEvent)
             {
-                shouldAttackMelee = true;
+                if (ActiveStanceSettings().useArtificialMeleeAttackDelay)
+                {
+                    artificialMeleeAttackTimer = ActiveStanceSettings().artificialMeleeAttackDelay;
+                }
+                else
+                {
+                    shouldAttackMelee = true;
+                }
             }
+        }
+
+        private void HandleAttackRanged(IEvent e)
+        {
+            if (e is AttackRangedEvent)
+            {
+                if (ActiveStanceSettings().useArtificialRangedAttackDelay)
+                {
+                    artificialRangedAttackTimer = ActiveStanceSettings().artificialRangedAttackDelay;
+                }
+                else
+                {
+                    shouldAttackRanged = true;
+                }
+            }
+        }
+
+        private void HandleChangeStance(IEvent e)
+        {
+            if (e is ChangeStanceEvent changeStanceEvent)
+            {
+                if (_stance != changeStanceEvent.Stance)
+                {
+                    _stance = changeStanceEvent.Stance;
+                    _stanceIndicator.color = ActiveStanceData().CharacterIndicatorColor;
+                }
+            }
+        }
+
+        private StanceSettings ActiveStanceSettings()
+        {
+            return _settings.StanceSettingsMap[_stance];
+        }
+
+        private ElementalStancesResources.ElementalStanceData ActiveStanceData()
+        {
+            return _elementalStancesResources.Data[_stance];
         }
     }
 
