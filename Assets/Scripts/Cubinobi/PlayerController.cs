@@ -30,9 +30,11 @@ namespace Cubinobi
         private BoxCollider2D _collider;
 
         [SerializeField]
+        [HideInInspector]
         private ShurikenController _shurikenPrefab;
 
         [SerializeField]
+        [HideInInspector]
         private Transform _projectilesParent;
 
         private float currentHorizontalVelocity;
@@ -142,8 +144,8 @@ namespace Cubinobi
             fallingGravityScale = ascendingGravityScale * ActiveStanceSettings().jumpFallingGravityMultiplier;
             jumpButtonReleasedGravityScale =
                 ascendingGravityScale * ActiveStanceSettings().jumpVariableHeightGravityMultiplier;
-            _rigidbody2D.gravityScale =
-                ascendingGravityScale; // todo check whether this should be here, consider adding if not equal to what  should be
+            // _rigidbody2D.gravityScale =
+            //     ascendingGravityScale; // todo check whether this should be here, consider adding if not equal to what  should be
 
             wasGrounded = isGrounded;
             isGrounded = IsGrounded();
@@ -352,7 +354,7 @@ namespace Cubinobi
             return new Rect
             {
                 Point = (Vector2) transform.position + new Vector2(0, -((size.y / 2) + (groundCheckHeight * 1.4f / 2))),
-                Size = new Vector2(size.x * 0.8f, groundCheckHeight)
+                Size = new Vector2(size.x * 0.94f, groundCheckHeight)
             };
         }
 
