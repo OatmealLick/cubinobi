@@ -10,6 +10,11 @@ namespace Cubinobi.Project
         [Title("Movement Parameters")]
         public float movementSpeed = 6.0f;
 
+        [InfoBox("How far uninterrupted dash will move you horizontally.")]
+        public float dashDistance = 2.5f;
+
+        public float dashTime = 0.4f;
+
         [Title("Jump Parameters")]
         [Range(1, 10), InfoBox("How high the character can reach in the peak of the jump")]
         public float jumpHeight = 5.0f;

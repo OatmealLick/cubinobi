@@ -14,7 +14,6 @@ namespace Cubinobi.Project
         {
             _eventManager = eventManager;
             _controls = new Controls();
-            InputSystem.settings.SetInternalFeatureFlag("DISABLE_SHORTCUT_SUPPORT", false);
         }
 
         public void Initialize()
