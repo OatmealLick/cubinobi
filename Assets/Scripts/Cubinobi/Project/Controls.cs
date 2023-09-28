@@ -48,6 +48,60 @@ namespace Cubinobi.Project
                     ""initialStateCheck"": true
                 },
                 {
+                    ""name"": ""ChangeStanceEarth"",
+                    ""type"": ""Button"",
+                    ""id"": ""76ef3c7d-9bc6-4a43-be94-914d4f83e9d5"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ChangeStanceFire"",
+                    ""type"": ""Button"",
+                    ""id"": ""83e03412-d106-4e91-a5c4-4485bfcd7a2a"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ChangeStanceWind"",
+                    ""type"": ""Button"",
+                    ""id"": ""5ae40f46-272a-4b24-8f57-95f80df76fdf"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ChangeStanceWater"",
+                    ""type"": ""Button"",
+                    ""id"": ""4c84bcd6-e733-4b04-b284-151f40b59e46"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ChangeStanceVoid"",
+                    ""type"": ""Button"",
+                    ""id"": ""31934797-ba7c-4521-bb7a-3c6f4d9c03a2"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ChangeStanceBasic"",
+                    ""type"": ""Button"",
+                    ""id"": ""b4614377-8986-4af6-9085-b9cc18441349"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
                     ""name"": ""AttackMelee"",
                     ""type"": ""Button"",
                     ""id"": ""9bb9a7ba-2317-47ff-a7f2-279565504e28"",
@@ -63,60 +117,6 @@ namespace Cubinobi.Project
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""ChangeStanceEarth"",
-                    ""type"": ""Button"",
-                    ""id"": ""76ef3c7d-9bc6-4a43-be94-914d4f83e9d5"",
-                    ""expectedControlType"": ""Button"",
-                    ""processors"": """",
-                    ""interactions"": ""MultiTap(tapCount=3)"",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""ChangeStanceFire"",
-                    ""type"": ""Button"",
-                    ""id"": ""bc9a68b2-c86e-435b-9ad3-141b7b60afad"",
-                    ""expectedControlType"": ""Button"",
-                    ""processors"": """",
-                    ""interactions"": ""MultiTap(tapCount=3)"",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""ChangeStanceWind"",
-                    ""type"": ""Button"",
-                    ""id"": ""d791c3ba-beaa-4ae9-8710-e44acfd9bcd4"",
-                    ""expectedControlType"": ""Button"",
-                    ""processors"": """",
-                    ""interactions"": ""MultiTap(tapCount=3)"",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""ChangeStanceWater"",
-                    ""type"": ""Button"",
-                    ""id"": ""3a108acf-94ac-45de-aab6-5acc4051ac51"",
-                    ""expectedControlType"": ""Button"",
-                    ""processors"": """",
-                    ""interactions"": ""MultiTap(tapCount=3)"",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""ChangeStanceVoid"",
-                    ""type"": ""Button"",
-                    ""id"": ""4aed5275-ce6d-4ca6-9792-0fc22468b323"",
-                    ""expectedControlType"": ""Button"",
-                    ""processors"": """",
-                    ""interactions"": ""MultiTap(tapCount=3)"",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""ChangeStanceBasic"",
-                    ""type"": ""Button"",
-                    ""id"": ""2731bb08-dc90-409f-b0f5-0b99334790f3"",
-                    ""expectedControlType"": ""Button"",
-                    ""processors"": """",
-                    ""interactions"": ""MultiTap(tapCount=3)"",
                     ""initialStateCheck"": false
                 }
             ],
@@ -140,39 +140,6 @@ namespace Cubinobi.Project
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""Jump"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""4135d080-7f73-4bc3-8129-2861748a99c1"",
-                    ""path"": ""<Mouse>/rightButton"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""AttackMelee"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""24a18852-b2b4-4091-ae49-1407c61fec76"",
-                    ""path"": ""<Gamepad>/buttonEast"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""AttackMelee"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""b2ccfad5-76bb-42bd-9e1e-ce654a5f1a0c"",
-                    ""path"": ""<Keyboard>/2"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""AttackMelee"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -243,114 +210,334 @@ namespace Cubinobi.Project
                     ""isPartOfComposite"": true
                 },
                 {
-                    ""name"": """",
-                    ""id"": ""f1ac8b1d-8d52-4bde-9633-5e0b2dd3d8f3"",
+                    ""name"": ""Keyboard"",
+                    ""id"": ""907c604c-7c74-43f6-8ebe-bdbea1d0efca"",
+                    ""path"": ""OneModifier"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ChangeStanceEarth"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""Modifier"",
+                    ""id"": ""dfce0a9d-ffef-49c6-9833-cd6d21830958"",
+                    ""path"": ""<Keyboard>/shift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ChangeStanceEarth"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""Binding"",
+                    ""id"": ""8432b50a-053f-4dec-ae50-1540259783d5"",
                     ""path"": ""<Keyboard>/1"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""ChangeStanceEarth"",
                     ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""Gamepad"",
+                    ""id"": ""b0917bb6-02df-43f7-b2b4-c24852026ed7"",
+                    ""path"": ""OneModifier"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ChangeStanceEarth"",
+                    ""isComposite"": true,
                     ""isPartOfComposite"": false
                 },
                 {
-                    ""name"": """",
-                    ""id"": ""51ee080a-bcc7-4228-969d-1d926fb09b72"",
+                    ""name"": ""Modifier"",
+                    ""id"": ""dfd598be-1b2a-4eea-b2e4-60c1b94503e5"",
+                    ""path"": ""<Gamepad>/leftTrigger"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ChangeStanceEarth"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""Binding"",
+                    ""id"": ""5f053bcd-dba7-4307-aef8-3bb6d9a346d1"",
                     ""path"": ""<Gamepad>/buttonNorth"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""ChangeStanceEarth"",
                     ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""Keyboard"",
+                    ""id"": ""2ea2c5d7-4bc0-472f-81c8-27786aaceed4"",
+                    ""path"": ""OneModifier"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ChangeStanceFire"",
+                    ""isComposite"": true,
                     ""isPartOfComposite"": false
                 },
                 {
-                    ""name"": """",
-                    ""id"": ""86eabb40-4f66-4e0e-9cf3-cad044d3d543"",
+                    ""name"": ""modifier"",
+                    ""id"": ""fb5b75da-521f-4adf-b988-5f5cae1d6c50"",
+                    ""path"": ""<Keyboard>/shift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ChangeStanceFire"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""binding"",
+                    ""id"": ""16a8a1a5-9045-4950-a0d6-4d09b3877f79"",
                     ""path"": ""<Keyboard>/2"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""ChangeStanceFire"",
                     ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""Gamepad"",
+                    ""id"": ""64ad9325-9322-43c1-9e0a-870fbddb4de3"",
+                    ""path"": ""OneModifier"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ChangeStanceFire"",
+                    ""isComposite"": true,
                     ""isPartOfComposite"": false
                 },
                 {
-                    ""name"": """",
-                    ""id"": ""626a0525-8e87-4b6c-b03e-0c5ddba85d0b"",
+                    ""name"": ""modifier"",
+                    ""id"": ""101d2613-60f8-4317-9916-d6a0fcf562c3"",
+                    ""path"": ""<Gamepad>/leftTrigger"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ChangeStanceFire"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""binding"",
+                    ""id"": ""fca8e878-921d-453c-b7b6-4fddca1b5ffb"",
                     ""path"": ""<Gamepad>/buttonEast"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""ChangeStanceFire"",
                     ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""Keyboard"",
+                    ""id"": ""2f61dba3-d525-4d5c-9432-0f2e58c9502c"",
+                    ""path"": ""OneModifier"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ChangeStanceWind"",
+                    ""isComposite"": true,
                     ""isPartOfComposite"": false
                 },
                 {
-                    ""name"": """",
-                    ""id"": ""155af649-456a-4359-be2d-6e4d8997ca0a"",
+                    ""name"": ""modifier"",
+                    ""id"": ""a0290b4f-0fe1-4957-b0e6-50bb52b0a181"",
+                    ""path"": ""<Keyboard>/shift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ChangeStanceWind"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""binding"",
+                    ""id"": ""5525ce65-09fc-4e03-842e-ed732c2dc667"",
                     ""path"": ""<Keyboard>/3"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""ChangeStanceWind"",
                     ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""Gamepad"",
+                    ""id"": ""78c578b5-105f-4e16-9db8-58527551c1ac"",
+                    ""path"": ""OneModifier"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ChangeStanceWind"",
+                    ""isComposite"": true,
                     ""isPartOfComposite"": false
                 },
                 {
-                    ""name"": """",
-                    ""id"": ""817ff6a3-b634-4387-bf2d-2dbd0233577c"",
+                    ""name"": ""modifier"",
+                    ""id"": ""a3984f57-209e-4820-ad20-5909874ed5d6"",
+                    ""path"": ""<Gamepad>/leftTrigger"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ChangeStanceWind"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""binding"",
+                    ""id"": ""f783a890-ef20-4f96-9be3-3d986d73ade7"",
                     ""path"": ""<Gamepad>/buttonSouth"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""ChangeStanceWind"",
                     ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""Keyboard"",
+                    ""id"": ""b5df581c-3291-4dd0-9d95-482c79a8ea35"",
+                    ""path"": ""OneModifier"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ChangeStanceWater"",
+                    ""isComposite"": true,
                     ""isPartOfComposite"": false
                 },
                 {
-                    ""name"": """",
-                    ""id"": ""76f84c3d-2bb3-4be4-b0f2-63251dee8790"",
+                    ""name"": ""modifier"",
+                    ""id"": ""8c5749c0-1231-4359-88cd-fbc5832bcf03"",
+                    ""path"": ""<Keyboard>/shift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ChangeStanceWater"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""binding"",
+                    ""id"": ""43c6752e-a743-4797-8a34-22c7762464b1"",
                     ""path"": ""<Keyboard>/4"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""ChangeStanceWater"",
                     ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""Gamepad"",
+                    ""id"": ""2d397d32-616d-4746-95b5-db43e2ec7f12"",
+                    ""path"": ""OneModifier"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ChangeStanceWater"",
+                    ""isComposite"": true,
                     ""isPartOfComposite"": false
                 },
                 {
-                    ""name"": """",
-                    ""id"": ""12598c77-4e24-494c-8a9d-7849d85879df"",
+                    ""name"": ""modifier"",
+                    ""id"": ""6b8c148f-069d-4e39-b5d5-b36a2c71f5e6"",
+                    ""path"": ""<Gamepad>/leftTrigger"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ChangeStanceWater"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""binding"",
+                    ""id"": ""624b246a-ca17-4f36-b326-7e34e4482c35"",
                     ""path"": ""<Gamepad>/buttonWest"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""ChangeStanceWater"",
                     ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""Keyboard"",
+                    ""id"": ""8e8f24a5-c1e0-4f15-ad82-e19e87167201"",
+                    ""path"": ""OneModifier"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ChangeStanceVoid"",
+                    ""isComposite"": true,
                     ""isPartOfComposite"": false
                 },
                 {
-                    ""name"": """",
-                    ""id"": ""b92c8871-5fb2-4c5d-84f9-0640da312888"",
+                    ""name"": ""modifier"",
+                    ""id"": ""2aa22d67-4bc5-48ce-8c5f-eb09fab7e9c9"",
+                    ""path"": ""<Keyboard>/shift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ChangeStanceVoid"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""binding"",
+                    ""id"": ""757ba8eb-c3a9-4fff-97c5-1415e89bd628"",
                     ""path"": ""<Keyboard>/5"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""ChangeStanceVoid"",
                     ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""Keyboard"",
+                    ""id"": ""3bec9629-8f01-4da6-8c05-b0ff50570441"",
+                    ""path"": ""OneModifier"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ChangeStanceBasic"",
+                    ""isComposite"": true,
                     ""isPartOfComposite"": false
                 },
                 {
-                    ""name"": """",
-                    ""id"": ""fa374c50-d8f6-4561-8fea-7726a4642336"",
+                    ""name"": ""modifier"",
+                    ""id"": ""0b5a76ec-cba9-468f-bd73-1b891e7c33dd"",
+                    ""path"": ""<Keyboard>/shift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ChangeStanceBasic"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""binding"",
+                    ""id"": ""d6bf0d6f-692b-4955-b605-4d341b42a8c8"",
                     ""path"": ""<Keyboard>/0"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""ChangeStanceBasic"",
                     ""isComposite"": false,
-                    ""isPartOfComposite"": false
+                    ""isPartOfComposite"": true
                 },
                 {
                     ""name"": """",
@@ -376,12 +563,23 @@ namespace Cubinobi.Project
                 },
                 {
                     ""name"": """",
-                    ""id"": ""a2aac446-4553-4ff2-a965-bab57ce28001"",
-                    ""path"": ""<Keyboard>/1"",
+                    ""id"": ""4135d080-7f73-4bc3-8129-2861748a99c1"",
+                    ""path"": ""<Mouse>/rightButton"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""AttackRanged"",
+                    ""action"": ""AttackMelee"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""24a18852-b2b4-4091-ae49-1407c61fec76"",
+                    ""path"": ""<Gamepad>/buttonEast"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""AttackMelee"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -394,14 +592,14 @@ namespace Cubinobi.Project
             m_Game = asset.FindActionMap("Game", throwIfNotFound: true);
             m_Game_Jump = m_Game.FindAction("Jump", throwIfNotFound: true);
             m_Game_Move = m_Game.FindAction("Move", throwIfNotFound: true);
-            m_Game_AttackMelee = m_Game.FindAction("AttackMelee", throwIfNotFound: true);
-            m_Game_AttackRanged = m_Game.FindAction("AttackRanged", throwIfNotFound: true);
             m_Game_ChangeStanceEarth = m_Game.FindAction("ChangeStanceEarth", throwIfNotFound: true);
             m_Game_ChangeStanceFire = m_Game.FindAction("ChangeStanceFire", throwIfNotFound: true);
             m_Game_ChangeStanceWind = m_Game.FindAction("ChangeStanceWind", throwIfNotFound: true);
             m_Game_ChangeStanceWater = m_Game.FindAction("ChangeStanceWater", throwIfNotFound: true);
             m_Game_ChangeStanceVoid = m_Game.FindAction("ChangeStanceVoid", throwIfNotFound: true);
             m_Game_ChangeStanceBasic = m_Game.FindAction("ChangeStanceBasic", throwIfNotFound: true);
+            m_Game_AttackMelee = m_Game.FindAction("AttackMelee", throwIfNotFound: true);
+            m_Game_AttackRanged = m_Game.FindAction("AttackRanged", throwIfNotFound: true);
         }
 
         public void Dispose()
@@ -465,28 +663,28 @@ namespace Cubinobi.Project
         private List<IGameActions> m_GameActionsCallbackInterfaces = new List<IGameActions>();
         private readonly InputAction m_Game_Jump;
         private readonly InputAction m_Game_Move;
-        private readonly InputAction m_Game_AttackMelee;
-        private readonly InputAction m_Game_AttackRanged;
         private readonly InputAction m_Game_ChangeStanceEarth;
         private readonly InputAction m_Game_ChangeStanceFire;
         private readonly InputAction m_Game_ChangeStanceWind;
         private readonly InputAction m_Game_ChangeStanceWater;
         private readonly InputAction m_Game_ChangeStanceVoid;
         private readonly InputAction m_Game_ChangeStanceBasic;
+        private readonly InputAction m_Game_AttackMelee;
+        private readonly InputAction m_Game_AttackRanged;
         public struct GameActions
         {
             private @Controls m_Wrapper;
             public GameActions(@Controls wrapper) { m_Wrapper = wrapper; }
             public InputAction @Jump => m_Wrapper.m_Game_Jump;
             public InputAction @Move => m_Wrapper.m_Game_Move;
-            public InputAction @AttackMelee => m_Wrapper.m_Game_AttackMelee;
-            public InputAction @AttackRanged => m_Wrapper.m_Game_AttackRanged;
             public InputAction @ChangeStanceEarth => m_Wrapper.m_Game_ChangeStanceEarth;
             public InputAction @ChangeStanceFire => m_Wrapper.m_Game_ChangeStanceFire;
             public InputAction @ChangeStanceWind => m_Wrapper.m_Game_ChangeStanceWind;
             public InputAction @ChangeStanceWater => m_Wrapper.m_Game_ChangeStanceWater;
             public InputAction @ChangeStanceVoid => m_Wrapper.m_Game_ChangeStanceVoid;
             public InputAction @ChangeStanceBasic => m_Wrapper.m_Game_ChangeStanceBasic;
+            public InputAction @AttackMelee => m_Wrapper.m_Game_AttackMelee;
+            public InputAction @AttackRanged => m_Wrapper.m_Game_AttackRanged;
             public InputActionMap Get() { return m_Wrapper.m_Game; }
             public void Enable() { Get().Enable(); }
             public void Disable() { Get().Disable(); }
@@ -502,12 +700,6 @@ namespace Cubinobi.Project
                 @Move.started += instance.OnMove;
                 @Move.performed += instance.OnMove;
                 @Move.canceled += instance.OnMove;
-                @AttackMelee.started += instance.OnAttackMelee;
-                @AttackMelee.performed += instance.OnAttackMelee;
-                @AttackMelee.canceled += instance.OnAttackMelee;
-                @AttackRanged.started += instance.OnAttackRanged;
-                @AttackRanged.performed += instance.OnAttackRanged;
-                @AttackRanged.canceled += instance.OnAttackRanged;
                 @ChangeStanceEarth.started += instance.OnChangeStanceEarth;
                 @ChangeStanceEarth.performed += instance.OnChangeStanceEarth;
                 @ChangeStanceEarth.canceled += instance.OnChangeStanceEarth;
@@ -526,6 +718,12 @@ namespace Cubinobi.Project
                 @ChangeStanceBasic.started += instance.OnChangeStanceBasic;
                 @ChangeStanceBasic.performed += instance.OnChangeStanceBasic;
                 @ChangeStanceBasic.canceled += instance.OnChangeStanceBasic;
+                @AttackMelee.started += instance.OnAttackMelee;
+                @AttackMelee.performed += instance.OnAttackMelee;
+                @AttackMelee.canceled += instance.OnAttackMelee;
+                @AttackRanged.started += instance.OnAttackRanged;
+                @AttackRanged.performed += instance.OnAttackRanged;
+                @AttackRanged.canceled += instance.OnAttackRanged;
             }
 
             private void UnregisterCallbacks(IGameActions instance)
@@ -536,12 +734,6 @@ namespace Cubinobi.Project
                 @Move.started -= instance.OnMove;
                 @Move.performed -= instance.OnMove;
                 @Move.canceled -= instance.OnMove;
-                @AttackMelee.started -= instance.OnAttackMelee;
-                @AttackMelee.performed -= instance.OnAttackMelee;
-                @AttackMelee.canceled -= instance.OnAttackMelee;
-                @AttackRanged.started -= instance.OnAttackRanged;
-                @AttackRanged.performed -= instance.OnAttackRanged;
-                @AttackRanged.canceled -= instance.OnAttackRanged;
                 @ChangeStanceEarth.started -= instance.OnChangeStanceEarth;
                 @ChangeStanceEarth.performed -= instance.OnChangeStanceEarth;
                 @ChangeStanceEarth.canceled -= instance.OnChangeStanceEarth;
@@ -560,6 +752,12 @@ namespace Cubinobi.Project
                 @ChangeStanceBasic.started -= instance.OnChangeStanceBasic;
                 @ChangeStanceBasic.performed -= instance.OnChangeStanceBasic;
                 @ChangeStanceBasic.canceled -= instance.OnChangeStanceBasic;
+                @AttackMelee.started -= instance.OnAttackMelee;
+                @AttackMelee.performed -= instance.OnAttackMelee;
+                @AttackMelee.canceled -= instance.OnAttackMelee;
+                @AttackRanged.started -= instance.OnAttackRanged;
+                @AttackRanged.performed -= instance.OnAttackRanged;
+                @AttackRanged.canceled -= instance.OnAttackRanged;
             }
 
             public void RemoveCallbacks(IGameActions instance)
@@ -581,14 +779,14 @@ namespace Cubinobi.Project
         {
             void OnJump(InputAction.CallbackContext context);
             void OnMove(InputAction.CallbackContext context);
-            void OnAttackMelee(InputAction.CallbackContext context);
-            void OnAttackRanged(InputAction.CallbackContext context);
             void OnChangeStanceEarth(InputAction.CallbackContext context);
             void OnChangeStanceFire(InputAction.CallbackContext context);
             void OnChangeStanceWind(InputAction.CallbackContext context);
             void OnChangeStanceWater(InputAction.CallbackContext context);
             void OnChangeStanceVoid(InputAction.CallbackContext context);
             void OnChangeStanceBasic(InputAction.CallbackContext context);
+            void OnAttackMelee(InputAction.CallbackContext context);
+            void OnAttackRanged(InputAction.CallbackContext context);
         }
     }
 }

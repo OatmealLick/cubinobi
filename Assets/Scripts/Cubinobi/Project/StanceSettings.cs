@@ -26,9 +26,6 @@ namespace Cubinobi.Project
         public float jumpVariableHeightGravityMultiplier = 1.8f;
 
         [Title("Melee Attack Parameters")]
-        public bool useArtificialMeleeAttackDelay = false;
-        [Range(0f, 1.5f)]
-        public float artificialMeleeAttackDelay = 0.0f;
         
         [InfoBox("Order right, down, left, up. Position Offset from the center of Sprite. Visible in play mode.")]
         public AttackHitbox[] MeleeAttackHitboxes = new AttackHitbox[4];
@@ -36,10 +33,6 @@ namespace Cubinobi.Project
         [Title("Ranged Attack Parameters")]
         [Range(0.1f, 200)]
         public float rangedAttackSpeed = 50;
-        
-        public bool useArtificialRangedAttackDelay = false;
-        [Range(0f, 1.5f)]
-        public float artificialRangedAttackDelay = 0.0f;
         
         [InfoBox("Order right, down, left, up. Position Offset from the center of Sprite. Visible in play mode.")]
         public AttackHitbox[] RangedAttackHitboxes = new AttackHitbox[4];

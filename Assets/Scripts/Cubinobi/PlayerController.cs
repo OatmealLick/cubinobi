@@ -1,5 +1,4 @@
 using System;
-using System.Timers;
 using Cubinobi.Project;
 using DG.Tweening;
 using UnityEngine;
@@ -209,34 +208,6 @@ namespace Cubinobi
 
             _rigidbody2D.velocity = currentVelocity;
 
-            // todo remove start
-            if (ActiveStanceSettings().useArtificialMeleeAttackDelay)
-            {
-                if (artificialMeleeAttackTimer > 0)
-                {
-                    artificialMeleeAttackTimer -= Time.deltaTime;
-                    if (artificialMeleeAttackTimer < 0)
-                    {
-                        artificialMeleeAttackTimer = 0.0f;
-                        shouldAttackMelee = true;
-                    }
-                }
-            }
-
-            if (ActiveStanceSettings().useArtificialRangedAttackDelay)
-            {
-                if (artificialRangedAttackTimer > 0)
-                {
-                    artificialRangedAttackTimer -= Time.deltaTime;
-                    if (artificialRangedAttackTimer < 0)
-                    {
-                        artificialRangedAttackTimer = 0.0f;
-                        shouldAttackRanged = true;
-                    }
-                }
-            }
-            // todo remove stop
-
             // cleanup part of fixed update loop
 
             for (var i = 0; i < groundedResults.Length; ++i)
@@ -298,7 +269,7 @@ namespace Cubinobi
                     : Math.Abs(hitbox.Size.x);
                 shuriken.Setup(
                     ActiveStanceSettings(),
-                    DirectionForAttack(_facingAttack),
+                    DirectionForAttack(),
                     distance,
                     enemiesMask,
                     levelGeometryMask
@@ -368,7 +339,7 @@ namespace Cubinobi
             };
         }
 
-        private Vector2 DirectionForAttack(FacingAttack facingAttack)
+        private Vector2 DirectionForAttack()
         {
             return Quaternion.AngleAxis(90 * (int) _facingAttack, Vector3.back) * Vector3.right;
         }
@@ -455,14 +426,7 @@ namespace Cubinobi
         {
             if (e is AttackMeleeEvent)
             {
-                if (ActiveStanceSettings().useArtificialMeleeAttackDelay)
-                {
-                    artificialMeleeAttackTimer = ActiveStanceSettings().artificialMeleeAttackDelay;
-                }
-                else
-                {
-                    shouldAttackMelee = true;
-                }
+                shouldAttackMelee = true;
             }
         }
 
@@ -470,14 +434,7 @@ namespace Cubinobi
         {
             if (e is AttackRangedEvent)
             {
-                if (ActiveStanceSettings().useArtificialRangedAttackDelay)
-                {
-                    artificialRangedAttackTimer = ActiveStanceSettings().artificialRangedAttackDelay;
-                }
-                else
-                {
-                    shouldAttackRanged = true;
-                }
+                shouldAttackRanged = true;
             }
         }
 
