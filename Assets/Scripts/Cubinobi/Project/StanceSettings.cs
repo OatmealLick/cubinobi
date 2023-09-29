@@ -1,4 +1,5 @@
 using System;
+using DG.Tweening;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -10,10 +11,22 @@ namespace Cubinobi.Project
         [Title("Movement Parameters")]
         public float movementSpeed = 6.0f;
 
-        [InfoBox("How far uninterrupted dash will move you horizontally.")]
-        public float dashDistance = 2.5f;
+        [InfoBox(
+            "How far uninterrupted dash will move you horizontally if no easing. (If there is easing this needs to be higher and adjusted per easing options)")]
+        public float dashDistance = 6;
 
-        public float dashTime = 0.4f;
+        public float dashTime = 0.2f;
+
+        [InfoBox("If set to true, the dash velocity changes throughout the dash. (Can decelerate)")]
+        public bool isEasingDash = false;
+        
+        [ShowIf("isEasingDash")]
+        [InfoBox("See easings.net for visualisation. For dash we want Out easings (deceleration) not In (acceleration).")]
+        public Ease dashVelocityEase = Ease.OutQuint;
+
+        [ShowIf("isEasingDash")]
+        [Range(0, 1), InfoBox("End value for easing, expressed as percent of the dash speed. If 0, then character will full stop at the end of dash.")]
+        public float dashEndVelocityPercentage;
 
         [Title("Jump Parameters")]
         [Range(1, 10), InfoBox("How high the character can reach in the peak of the jump")]

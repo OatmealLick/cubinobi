@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Cubinobi.Project;
 using DG.Tweening;
 using UnityEngine;
@@ -35,6 +36,9 @@ namespace Cubinobi
         [SerializeField]
         [HideInInspector]
         private Transform _projectilesParent;
+
+        [SerializeField]
+        private TrailRenderer _trailRenderer;
 
         private float currentHorizontalVelocity;
 
@@ -84,9 +88,12 @@ namespace Cubinobi
         private bool shouldAttackRanged;
         private readonly Color attackRangedGizmoColor = new(0, 1, 1, 0.15f);
 
-        // todo remove artificials
-        private float artificialMeleeAttackTimer;
-        private float artificialRangedAttackTimer;
+        private bool shouldDash;
+        private float dashTimer;
+        private Tween dashTween;
+
+        [SerializeField]
+        private State _state;
 
         [Inject]
         private void Construct(EventManager eventManager,
@@ -110,7 +117,10 @@ namespace Cubinobi
             _eventManager.AddListener<JumpStopEvent>(HandleStopJump);
             _eventManager.AddListener<AttackMeleeEvent>(HandleAttackMelee);
             _eventManager.AddListener<AttackRangedEvent>(HandleAttackRanged);
+            _eventManager.AddListener<DashEvent>(HandleDash);
             _eventManager.AddListener<ChangeStanceEvent>(HandleChangeStance);
+
+            _state = State.Default;
         }
 
         private void OnDestroy()
@@ -121,6 +131,7 @@ namespace Cubinobi
             _eventManager.RemoveListener<JumpStopEvent>(HandleStopJump);
             _eventManager.RemoveListener<AttackMeleeEvent>(HandleAttackMelee);
             _eventManager.RemoveListener<AttackRangedEvent>(HandleAttackRanged);
+            _eventManager.RemoveListener<DashEvent>(HandleDash);
             _eventManager.RemoveListener<ChangeStanceEvent>(HandleChangeStance);
         }
 
@@ -137,21 +148,26 @@ namespace Cubinobi
 
         private void FixedUpdate()
         {
+            var stanceSettings = ActiveStanceSettings();
+
+            // cleanup part of fixed update loop, it's in the beginning so that you can safely 'return'
+            for (var i = 0; i < groundedResults.Length; ++i)
+            {
+                groundedResults[i] = null;
+            }
+
             // this is updated per frame to ease testing. Once it's set we can hard code it.
             ascendingGravityScale =
-                GravityScaler(ActiveStanceSettings().jumpHeight, ActiveStanceSettings().jumpTimeToPeak);
-            fallingGravityScale = ascendingGravityScale * ActiveStanceSettings().jumpFallingGravityMultiplier;
+                GravityScaler(stanceSettings.jumpHeight, stanceSettings.jumpTimeToPeak);
+            fallingGravityScale = ascendingGravityScale * stanceSettings.jumpFallingGravityMultiplier;
             jumpButtonReleasedGravityScale =
-                ascendingGravityScale * ActiveStanceSettings().jumpVariableHeightGravityMultiplier;
-            // _rigidbody2D.gravityScale =
-            //     ascendingGravityScale; // todo check whether this should be here, consider adding if not equal to what  should be
+                ascendingGravityScale * stanceSettings.jumpVariableHeightGravityMultiplier;
 
             wasGrounded = isGrounded;
             isGrounded = IsGrounded();
 
-            var currentVelocity = _rigidbody2D.velocity;
-
             // just landed, 'reset' all the jump state variables
+            // what about the case where you tried to jump but couldn't because you hit the ceiling?
             if (isGrounded && !wasGrounded)
             {
                 canJumpDuringThisFlight = true;
@@ -159,61 +175,113 @@ namespace Cubinobi
                 jumpTimer = 0.0f;
                 isJumping = false;
                 _rigidbody2D.gravityScale = ascendingGravityScale;
+                _state = State.Default;
             }
 
-            if (Util.IsNotZero(currentHorizontalVelocity))
-            {
-                currentVelocity.x = currentHorizontalVelocity;
-            }
-            // should stop but is moving
-            else if (Util.IsNotZero(currentVelocity.x) && Util.IsZero(currentHorizontalVelocity))
-            {
-                currentVelocity.x = 0.0f;
-            }
+            var currentVelocity = _rigidbody2D.velocity;
 
-            if (shouldStartJump)
+            if (_state == State.Dashing)
             {
-                // all checks that should happen to allow character to jump go here
-                if (canJumpDuringThisFlight)
+                dashTimer -= Time.fixedDeltaTime;
+                if (dashTimer > 0)
                 {
-                    // jump started
-                    canJumpDuringThisFlight = false;
-                    isGrounded = false;
-                    isJumping = true;
-                    currentVelocity.y = InitialVerticalVelocity(ActiveStanceSettings().jumpHeight,
-                        ActiveStanceSettings().jumpTimeToPeak);
+                    return;
                 }
 
-                shouldStartJump = false;
+                // end of dash
+                _trailRenderer.emitting = false;
+                if (isGrounded)
+                {
+                    _rigidbody2D.gravityScale = ascendingGravityScale;
+                    _state = State.Default;
+                }
+                else
+                {
+                    // in air dash
+                    _rigidbody2D.gravityScale = fallingGravityScale;
+                    _state = State.InAir;
+                }
             }
 
-            if (isJumping)
+            if (shouldDash)
+            {
+                shouldDash = false;
+                _state = State.Dashing;
+                _trailRenderer.emitting = true;
+                dashTimer = stanceSettings.dashTime;
+                var dashVelocity = DirectionForAttack() * stanceSettings.dashDistance /
+                                   stanceSettings.dashTime;
+
+                _rigidbody2D.velocity = dashVelocity;
+                if (stanceSettings.isEasingDash)
+                {
+                    dashTween = DOTween.To(
+                        () => _rigidbody2D.velocity,
+                        (x) => _rigidbody2D.velocity = x,
+                        dashVelocity * stanceSettings.dashEndVelocityPercentage,
+                        stanceSettings.dashTime
+                    ).SetEase(stanceSettings.dashVelocityEase);
+                }
+
+                _rigidbody2D.gravityScale = 0f;
+                return;
+            }
+
+            if (_state is State.Default or State.InAir)
+            {
+                if (Util.IsNotZero(currentHorizontalVelocity))
+                {
+                    currentVelocity.x = currentHorizontalVelocity;
+                }
+                // should stop but is moving
+                else if (Util.IsNotZero(currentVelocity.x) && Util.IsZero(currentHorizontalVelocity))
+                {
+                    currentVelocity.x = 0.0f;
+                }
+
+                if (shouldStartJump)
+                {
+                    // all checks that should happen to allow character to jump go here
+                    if (canJumpDuringThisFlight)
+                    {
+                        // jump started
+                        canJumpDuringThisFlight = false;
+                        isGrounded = false; // are you sure?
+                        isJumping = true; // is needed when having state?
+                        currentVelocity.y = InitialVerticalVelocity(stanceSettings.jumpHeight,
+                            stanceSettings.jumpTimeToPeak);
+                        _state = State.InAir;
+                    }
+
+                    shouldStartJump = false;
+                }
+            }
+
+            if (_state == State.InAir && isJumping)
             {
                 jumpTimer += Time.fixedDeltaTime;
 
-                if (jumpTimer <= ActiveStanceSettings().jumpTimeToPeak && jumpButtonReleased &&
+                if (jumpTimer <= stanceSettings.jumpTimeToPeak && jumpButtonReleased &&
                     !Util.FloatEquals(_rigidbody2D.gravityScale, jumpButtonReleasedGravityScale))
                 {
                     _rigidbody2D.gravityScale = jumpButtonReleasedGravityScale;
                 }
             }
 
-            if (!isGrounded)
+            if (_state is State.Default or State.InAir)
             {
-                if (currentVelocity.y < 0 && !Util.FloatEquals(_rigidbody2D.gravityScale, fallingGravityScale))
+                // change to falling gravity if falls after jump, or walked off the cliff
+                if (!isGrounded)
                 {
-                    _rigidbody2D.gravityScale = fallingGravityScale;
+                    if (currentVelocity.y < 0 && !Util.FloatEquals(_rigidbody2D.gravityScale, fallingGravityScale))
+                    {
+                        _rigidbody2D.gravityScale = fallingGravityScale;
+                        _state = State.InAir;
+                    }
                 }
             }
 
             _rigidbody2D.velocity = currentVelocity;
-
-            // cleanup part of fixed update loop
-
-            for (var i = 0; i < groundedResults.Length; ++i)
-            {
-                groundedResults[i] = null;
-            }
         }
 
         private void Update()
@@ -252,7 +320,6 @@ namespace Cubinobi
                         return;
                     }
 
-                    Debug.Log($"Hit enemy {coll.name}, {coll.gameObject.name}");
                     coll.GetComponent<Enemy>().Hit();
                 }
             }
@@ -438,6 +505,14 @@ namespace Cubinobi
             }
         }
 
+        private void HandleDash(IEvent e)
+        {
+            if (e is DashEvent)
+            {
+                shouldDash = true;
+            }
+        }
+
         private void HandleChangeStance(IEvent e)
         {
             if (e is ChangeStanceEvent changeStanceEvent)
@@ -459,6 +534,13 @@ namespace Cubinobi
         {
             return _elementalStancesResources.Data[_stance];
         }
+
+        private enum State
+        {
+            Default = 0, // on ground, walking or standing
+            InAir = 1, // not on ground, falling or jumping
+            Dashing = 2,
+        }
     }
 
     public enum FacingAttack
@@ -470,7 +552,7 @@ namespace Cubinobi
         Up = 3,
     }
 
-    internal struct Rect
+    public struct Rect
     {
         public Vector2 Point;
         public Vector2 Size;

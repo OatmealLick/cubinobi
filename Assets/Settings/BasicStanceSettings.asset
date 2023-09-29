@@ -13,12 +13,15 @@ MonoBehaviour:
   m_Name: BasicStanceSettings
   m_EditorClassIdentifier: 
   movementSpeed: 6
+  dashDistance: 6
+  dashTime: 0.2
+  isEasingDash: 0
+  dashVelocityEase: 15
+  dashEndVelocityPercentage: 0.4
   jumpHeight: 5
   jumpTimeToPeak: 0.4
   jumpFallingGravityMultiplier: 1.4
   jumpVariableHeightGravityMultiplier: 1.8
-  useArtificialMeleeAttackDelay: 0
-  artificialMeleeAttackDelay: 0.5
   MeleeAttackHitboxes:
   - Size: {x: 1.8, y: 2.2}
     PositionOffset: {x: 1, y: 0}
@@ -29,8 +32,6 @@ MonoBehaviour:
   - Size: {x: 2.2, y: 1.8}
     PositionOffset: {x: 0, y: 1}
   rangedAttackSpeed: 50
-  useArtificialRangedAttackDelay: 0
-  artificialRangedAttackDelay: 0.5
   RangedAttackHitboxes:
   - Size: {x: 12, y: 0.5}
     PositionOffset: {x: 6, y: 0}

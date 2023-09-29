@@ -25,6 +25,8 @@ namespace Cubinobi.Project
             _controls.Game.Move.canceled += HandleStopMove;
             _controls.Game.AttackMelee.performed += HandleAttackMelee;
             _controls.Game.AttackRanged.performed += HandleAttackRanged;
+            _controls.Game.Dash.performed += HandleDash;
+            
             _controls.Game.ChangeStanceEarth.performed += HandleChangeStanceEarth;
             _controls.Game.ChangeStanceFire.performed += HandleChangeStanceFire;
             _controls.Game.ChangeStanceWind.performed += HandleChangeStanceWind;
@@ -41,6 +43,8 @@ namespace Cubinobi.Project
             _controls.Game.Move.canceled -= HandleStopMove;
             _controls.Game.AttackMelee.performed -= HandleAttackMelee;
             _controls.Game.AttackRanged.performed -= HandleAttackRanged;
+            _controls.Game.Dash.performed -= HandleDash;
+            
             _controls.Game.ChangeStanceEarth.performed -= HandleChangeStanceEarth;
             _controls.Game.ChangeStanceFire.performed -= HandleChangeStanceFire;
             _controls.Game.ChangeStanceWind.performed -= HandleChangeStanceWind;
@@ -62,7 +66,6 @@ namespace Cubinobi.Project
         private void HandleStartMove(InputAction.CallbackContext context)
         {
             var direction = context.ReadValue<Vector2>();
-            Debug.Log($"Input Manager :: Start Move direction {direction}");
             _eventManager.SendEvent(new StartMoveEvent(direction));
         }
         
@@ -79,6 +82,11 @@ namespace Cubinobi.Project
         private void HandleAttackRanged(InputAction.CallbackContext context)
         {
             _eventManager.SendEvent(new AttackRangedEvent());
+        }
+
+        private void HandleDash(InputAction.CallbackContext context)
+        {
+            _eventManager.SendEvent(new DashEvent());
         }
 
         private void HandleChangeStanceEarth(InputAction.CallbackContext context)
@@ -144,6 +152,9 @@ namespace Cubinobi.Project
     public class AttackMeleeEvent : IEvent
     {}
     public class AttackRangedEvent : IEvent
+    {}
+
+    public class DashEvent : IEvent
     {}
 
     public class ChangeStanceEvent : IEvent
