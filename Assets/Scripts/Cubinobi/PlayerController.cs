@@ -1,9 +1,16 @@
 using System;
-using System.Linq;
+using System.Timers;
 using Cubinobi.Project;
 using DG.Tweening;
+using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.UI;
 using Zenject;
+
+/*
+ * TODO 1. Hit Effects for player
+ */
+
 
 namespace Cubinobi
 {
@@ -38,20 +45,39 @@ namespace Cubinobi
         private Transform _projectilesParent;
 
         [SerializeField]
+        [HideInInspector]
         private TrailRenderer _trailRenderer;
-
-        private float currentHorizontalVelocity;
 
         [SerializeField]
         private bool wasGrounded;
 
         [SerializeField]
         private bool isGrounded; // indicates whether is grounded, updated every frame
+        
+        [SerializeField]
+        private bool isJumping; // indicates whether jumped (you can fall and not be grounded but still not jumping)
+
+        [SerializeField]
+        private bool isInvulnerable;
 
         [SerializeField]
         private bool _facingRight = true; // facing for movement, separate from facing for attack
         // facing update rules so far
         // 0. Update only on inputs treated as valid movement (deadzone threshold)
+        
+        [SerializeField]
+        private FacingAttack _facingAttack = FacingAttack.Right;
+
+        [SerializeField]
+        private ElementalStance _stance = ElementalStance.Basic;
+
+        [SerializeField]
+        private State _state;
+
+        [SerializeField]
+        private int health;
+        
+        private float currentHorizontalVelocity;
 
         private readonly Collider2D[] groundedResults = new Collider2D [10];
         private int levelGeometryMask;
@@ -65,11 +91,6 @@ namespace Cubinobi
         private bool jumpButtonReleased;
         private float jumpTimer;
 
-        [SerializeField]
-        private bool isJumping; // indicates whether jumped (you can fall and not be grounded but still not jumping)
-
-        [SerializeField]
-        private FacingAttack _facingAttack = FacingAttack.Right;
         // facing update rules so far
         // 0. Update only on inputs treated as valid movement (deadzone threshold)
         // 1. If you actively press keys it should be set based on those keys
@@ -82,9 +103,6 @@ namespace Cubinobi
         private Color attackMeleeGizmoColor = new(0, 1, 1, 0.3f);
         private readonly Color defaultAttackMeleeGizmoColor = new(0, 1, 1, 0.3f);
 
-        [SerializeField]
-        private ElementalStance _stance = ElementalStance.Basic;
-
         private bool shouldAttackRanged;
         private readonly Color attackRangedGizmoColor = new(0, 1, 1, 0.15f);
 
@@ -92,8 +110,20 @@ namespace Cubinobi
         private float dashTimer;
         private Tween dashTween;
 
+        private float invulnerabilityTimer;
+        private Tween invulnerabilityTween;
+
+        [HideInInspector]
         [SerializeField]
-        private State _state;
+        private Slider healthSlider;
+
+        [HideInInspector]
+        [SerializeField]
+        private Slider invulnerabilitySlider;
+
+        [HideInInspector]
+        [SerializeField]
+        private Slider stunSlider;
 
         [Inject]
         private void Construct(EventManager eventManager,
@@ -120,7 +150,9 @@ namespace Cubinobi
             _eventManager.AddListener<DashEvent>(HandleDash);
             _eventManager.AddListener<ChangeStanceEvent>(HandleChangeStance);
 
-            _state = State.Default;
+            _state = UpdateState(State.Default);
+            _stance = UpdateStance(ElementalStance.Basic);
+            health = _settings.health;
         }
 
         private void OnDestroy()
@@ -133,6 +165,32 @@ namespace Cubinobi
             _eventManager.RemoveListener<AttackRangedEvent>(HandleAttackRanged);
             _eventManager.RemoveListener<DashEvent>(HandleDash);
             _eventManager.RemoveListener<ChangeStanceEvent>(HandleChangeStance);
+        }
+
+        public void TakeDamage(int damage = 0, HitEffects hitEffects = null)
+        {
+            if (isInvulnerable)
+            {
+                return;
+            }
+            
+            health -= damage;
+            if (health <= 0)
+            {
+                Die();
+            }
+
+            healthSlider.value = (float) health / _settings.health;
+
+            isInvulnerable = true;
+            invulnerabilityTimer = _settings.invulnerabilityDuration;
+            invulnerabilitySlider.value = 1;
+        }
+
+        private void Die()
+        {
+            Debug.Log("You just died");
+            Destroy(gameObject);
         }
 
         private static float GravityScaler(float jumpHeight, float timeToPeak)
@@ -175,7 +233,7 @@ namespace Cubinobi
                 jumpTimer = 0.0f;
                 isJumping = false;
                 _rigidbody2D.gravityScale = ascendingGravityScale;
-                _state = State.Default;
+                _state = UpdateState(State.Default);
             }
 
             var currentVelocity = _rigidbody2D.velocity;
@@ -193,20 +251,20 @@ namespace Cubinobi
                 if (isGrounded)
                 {
                     _rigidbody2D.gravityScale = ascendingGravityScale;
-                    _state = State.Default;
+                    _state = UpdateState(State.Default);
                 }
                 else
                 {
                     // in air dash
                     _rigidbody2D.gravityScale = fallingGravityScale;
-                    _state = State.InAir;
+                    _state = UpdateState(State.InAir);
                 }
             }
 
             if (shouldDash)
             {
                 shouldDash = false;
-                _state = State.Dashing;
+                _state = UpdateState(State.Dashing);
                 _trailRenderer.emitting = true;
                 dashTimer = stanceSettings.dashTime;
                 var dashVelocity = DirectionForAttack() * stanceSettings.dashDistance /
@@ -246,11 +304,11 @@ namespace Cubinobi
                     {
                         // jump started
                         canJumpDuringThisFlight = false;
-                        isGrounded = false; // are you sure?
-                        isJumping = true; // is needed when having state?
+                        isGrounded = false;
+                        isJumping = true;
                         currentVelocity.y = InitialVerticalVelocity(stanceSettings.jumpHeight,
                             stanceSettings.jumpTimeToPeak);
-                        _state = State.InAir;
+                        _state = UpdateState(State.InAir);
                     }
 
                     shouldStartJump = false;
@@ -276,7 +334,7 @@ namespace Cubinobi
                     if (currentVelocity.y < 0 && !Util.FloatEquals(_rigidbody2D.gravityScale, fallingGravityScale))
                     {
                         _rigidbody2D.gravityScale = fallingGravityScale;
-                        _state = State.InAir;
+                        _state = UpdateState(State.InAir);
                     }
                 }
             }
@@ -286,6 +344,20 @@ namespace Cubinobi
 
         private void Update()
         {
+            var stanceSettings = ActiveStanceSettings();
+
+            if (isInvulnerable)
+            {
+                invulnerabilityTimer = Math.Max(invulnerabilityTimer - Time.deltaTime, 0);
+                _eventManager.SendEvent(new PlayerInvulnerabilityChangedEvent(invulnerabilityTimer));
+                invulnerabilitySlider.value = invulnerabilityTimer / _settings.invulnerabilityDuration;
+
+                if (Util.IsZero(invulnerabilityTimer))
+                {
+                    isInvulnerable = false;
+                }
+            }
+            
             if (shouldAttackMelee)
             {
                 shouldAttackMelee = false;
@@ -320,7 +392,7 @@ namespace Cubinobi
                         return;
                     }
 
-                    coll.GetComponent<Enemy>().Hit();
+                    coll.GetComponent<Enemy>().TakeDamage(stanceSettings.meleeAttackDamage, stanceSettings.meleeAttackEffects);
                 }
             }
 
@@ -330,14 +402,16 @@ namespace Cubinobi
 
                 var shuriken = Instantiate(_shurikenPrefab, transform.position, Quaternion.identity,
                     _projectilesParent);
-                var hitbox = ActiveStanceSettings().RangedAttackHitboxes[(int) _facingAttack];
+                var hitbox = stanceSettings.RangedAttackHitboxes[(int) _facingAttack];
                 var distance = _facingAttack is FacingAttack.Down or FacingAttack.Up
                     ? Math.Abs(hitbox.Size.y)
                     : Math.Abs(hitbox.Size.x);
                 shuriken.Setup(
-                    ActiveStanceSettings(),
+                    stanceSettings.rangedAttackSpeed,
                     DirectionForAttack(),
                     distance,
+                    stanceSettings.rangedAttackDamage,
+                    stanceSettings.rangedAttackEffects,
                     enemiesMask,
                     levelGeometryMask
                 );
@@ -353,7 +427,6 @@ namespace Cubinobi
 
         private bool IsGrounded()
         {
-            // todo make sure it works when changing character sprite & size
             var rect = GroundedRect();
             var groundCollidersCount = Physics2D.OverlapBoxNonAlloc(
                 rect.Point,
@@ -519,7 +592,7 @@ namespace Cubinobi
             {
                 if (_stance != changeStanceEvent.Stance)
                 {
-                    _stance = changeStanceEvent.Stance;
+                    _stance = UpdateStance(changeStanceEvent.Stance);
                     _stanceIndicator.color = ActiveStanceData().CharacterIndicatorColor;
                 }
             }
@@ -535,11 +608,23 @@ namespace Cubinobi
             return _elementalStancesResources.Data[_stance];
         }
 
-        private enum State
+        public enum State
         {
             Default = 0, // on ground, walking or standing
             InAir = 1, // not on ground, falling or jumping
             Dashing = 2,
+        }
+
+        private State UpdateState(State state)
+        {
+            _eventManager.SendEvent(new PlayerStateChangedEvent(state));
+            return state;
+        }
+
+        private ElementalStance UpdateStance(ElementalStance stance)
+        {
+            _eventManager.SendEvent(new PlayerStanceChangedEvent(stance));
+            return stance;
         }
     }
 
@@ -556,5 +641,35 @@ namespace Cubinobi
     {
         public Vector2 Point;
         public Vector2 Size;
+    }
+
+    public class PlayerInvulnerabilityChangedEvent : IEvent
+    {
+        public float invulnerabilityTimer;
+
+        public PlayerInvulnerabilityChangedEvent(float invulnerabilityTimer)
+        {
+            this.invulnerabilityTimer = invulnerabilityTimer;
+        }
+    }
+
+    public class PlayerStanceChangedEvent : IEvent
+    {
+        public ElementalStance Stance;
+
+        public PlayerStanceChangedEvent(ElementalStance stance)
+        {
+            Stance = stance;
+        }
+    }
+
+    public class PlayerStateChangedEvent : IEvent
+    {
+        public PlayerController.State State;
+
+        public PlayerStateChangedEvent(PlayerController.State state)
+        {
+            State = state;
+        }
     }
 }

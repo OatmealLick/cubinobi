@@ -123,3 +123,4 @@ MonoBehaviour:
       Data: 
   deadzoneInputThreshold: 0.2
   attackMeleeGizmoFlashDuration: 0.3
+  EnemiesSettings: {fileID: 11400000, guid: 4f8cc77d44047fa48b2a27dbdf124aea, type: 2}

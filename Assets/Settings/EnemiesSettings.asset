@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dfbe580656ad46149245d23cc7e08193, type: 3}
+  m_Name: EnemiesSettings
+  m_EditorClassIdentifier: 
+  ceMovementSpeed: 4
+  ceChargingSpeed: 9
+  ceChargeLoadingTime: 0.8
+  ceChargingTime: 1
+  ceTimeToPatrolBeforeSwitchingDirections: 5
+  ceReactThePlayerDistance: 5
+  ceRecoveryAfterChargingTime: 0.6
+  ceHealth: 10
+  ceDamage: 2
+  ceEffects: {fileID: 0}

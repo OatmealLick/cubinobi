@@ -48,12 +48,18 @@ namespace Cubinobi.Project
         [InfoBox("Order right, down, left, up. Position Offset from the center of Sprite. Visible in play mode.")]
         public AttackHitbox[] MeleeAttackHitboxes = new AttackHitbox[4];
 
+        public int meleeAttackDamage = 2;
+        public HitEffects meleeAttackEffects;
+
         [Title("Ranged Attack Parameters")]
         [Range(0.1f, 200)]
         public float rangedAttackSpeed = 50;
         
         [InfoBox("Order right, down, left, up. Position Offset from the center of Sprite. Visible in play mode.")]
         public AttackHitbox[] RangedAttackHitboxes = new AttackHitbox[4];
+
+        public int rangedAttackDamage = 1;
+        public HitEffects rangedAttackEffects;
     }
 
     [Serializable]
