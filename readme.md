@@ -13,7 +13,7 @@ If you find information in this `Readme` useful you should check out Celeste cod
 ## Interconnected State ##
 
 The takeaways revolve around managing highly interconnected state.
-If you want to have a better idea what I am mean by that see the section below called <strong>How much interconnectedness</strong>.
+If you want to have a better idea what I am mean by that see the section below called <strong>[How much interconnectedness](#How-much-interconnectedness)</strong>.
 
 ## 1. Extracting code makes it more complex ##
 
@@ -171,6 +171,8 @@ It got me and I needed to come back at the drawing board and mentally escape the
 My overall takeaway from this study, is that I can manage the complexity of the program that has a lot of state, and I shouldn't
 be too eager with my extracting habits and method/class-size fever.
 It's way more important to focus on the real task, and treat the Clean Code techniques as the tools, not as the rule set for every program.
+
+![preview-gif](./preview.gif)
 
 ## How much interconnectedness ##
 Consider typical web development HTTP server-side code.
